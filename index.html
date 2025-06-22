@@ -3,946 +3,842 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מכון מקראות - בוט אישי</title>
+    <title>מכון מקראות - בוט חכם</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #2c5f5f 0%, #8b2635 100%);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
         }
-
         .chat-container {
+            max-width: 800px;
+            width: 100%;
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-            width: 100%;
-            max-width: 540px;
-            height: 90vh;
-            max-height: 900px;
-            min-height: 600px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            height: 95vh;
+            max-height: 900px;
         }
-
         .chat-header {
-            background: linear-gradient(135deg, #B71C1C, #37474F);
+            background: linear-gradient(135deg, #2c5f5f 0%, #8b2635 100%);
             color: white;
-            padding: 15px;
+            padding: 20px;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-
-        .chat-header h1 {
-            font-size: 24px;
-            margin-bottom: 6px;
-            font-weight: 700;
-        }
-
-        .chat-header p {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
         .chat-messages {
             flex: 1;
             padding: 15px;
             overflow-y: auto;
             background: #f8f9fa;
         }
-
         .message {
             margin-bottom: 15px;
-            animation: slideIn 0.3s ease-out;
         }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .user-message {
+            text-align: left;
         }
-
-        .message.bot {
-            display: flex;
-            align-items: flex-start;
+        .bot-message {
+            text-align: right;
         }
-
-        .message.user {
-            display: flex;
-            justify-content: flex-end;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            margin-left: 12px;
-            background: linear-gradient(135deg, #B71C1C, #37474F);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .message-content {
-            background: white;
+        .message-bubble {
+            display: inline-block;
+            max-width: 85%;
             padding: 12px 16px;
             border-radius: 18px;
-            max-width: 70%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            line-height: 1.6;
-        }
-
-        .message.user .message-content {
-            background: linear-gradient(135deg, #37474F, #263238);
-            color: white;
-        }
-
-        .quick-replies {
-            padding: 10px;
-            background: white;
-            border-top: 1px solid #eee;
-        }
-
-        .quick-replies h3 {
-            margin-bottom: 6px;
-            color: #333;
-            font-size: 13px;
-        }
-
-        .quick-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-        }
-
-        .quick-btn {
-            background: white;
-            border: 2px solid #B71C1C;
-            color: #B71C1C;
-            padding: 6px 9px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .quick-btn:hover {
-            background: #B71C1C;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(183, 28, 28, 0.3);
-        }
-
-        .chat-input {
-            padding: 10px;
-            background: white;
-            border-top: 1px solid #eee;
-        }
-
-        .input-container {
-            display: flex;
-            gap: 5px;
-        }
-
-        .message-input {
-            flex: 1;
-            padding: 15px 20px;
-            border: 2px solid #eee;
-            border-radius: 25px;
-            font-size: 16px;
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
-
-        .message-input:focus {
-            border-color: #B71C1C;
-        }
-
-        .send-btn {
-            background: linear-gradient(135deg, #B71C1C, #37474F);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: transform 0.2s ease;
-        }
-
-        .send-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .typing-indicator {
-            display: none;
-            padding: 15px 20px;
-            background: white;
-            border-radius: 18px;
-            max-width: 70%;
-            margin-bottom: 20px;
-        }
-
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-        }
-
-        .typing-dot {
-            width: 8px;
-            height: 8px;
-            background: #B71C1C;
-            border-radius: 50%;
-            animation: typing 1.4s infinite;
-        }
-
-        .typing-dot:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-dot:nth-child(3) {
-            animation-delay: 0.4s;
-        }
-
-        @keyframes typing {
-            0%, 60%, 100% {
-                transform: scale(1) translateY(0);
-                opacity: 0.5;
-            }
-            30% {
-                transform: scale(1.2) translateY(-10px);
-                opacity: 1;
-            }
-        }
-
-        .form-container {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 15px 0;
-        }
-
-        .form-field {
-            margin-bottom: 15px;
-        }
-
-        .form-field label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .form-field input, .form-field select {
-            width: 100%;
-            padding: 10px 15px;
-            border: 2px solid #eee;
-            border-radius: 8px;
+            margin: 4px;
+            word-wrap: break-word;
             font-size: 14px;
         }
-
-        .form-field input:focus, .form-field select:focus {
-            outline: none;
-            border-color: #B71C1C;
+        .user-message .message-bubble {
+            background: #8b2635;
+            color: white;
         }
-
-        .submit-form-btn {
-            background: linear-gradient(135deg, #B71C1C, #37474F);
+        .bot-message .message-bubble {
+            background: white;
+            color: #333;
+            border: 2px solid #e9ecef;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .message-bubble strong {
+            color: #8b2635;
+            font-weight: bold;
+        }
+        .message-bubble button {
+            background: #8b2635;
             color: white;
             border: none;
-            padding: 12px 25px;
-            border-radius: 8px;
+            padding: 10px 20px;
+            border-radius: 20px;
             cursor: pointer;
-            font-weight: 600;
-            width: 100%;
+            font-size: 14px;
+            margin: 10px 5px;
+            transition: background 0.3s ease;
         }
-
-        .highlight {
-            background: linear-gradient(120deg, #f5f0f2 0%, #f5f0f2 100%);
+        .message-bubble button:hover {
+            background: #a12e42;
+            transform: translateY(-1px);
+        }
+        .ai-indicator {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 11px;
+            margin-bottom: 8px;
+            display: inline-block;
+            font-weight: bold;
+        }
+        .input-container {
             padding: 15px;
-            border-radius: 10px;
-            border-right: 4px solid #B71C1C;
-            margin: 10px 0;
+            background: white;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 8px;
         }
-
-        /* התאמה לטלפון נייד */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .chat-container {
-                max-width: 95vw;
-                height: 95vh;
-                max-height: none;
-                min-height: 500px;
-                border-radius: 15px;
-            }
-
-            .chat-header {
-                padding: 10px;
-            }
-
-            .chat-header h1 {
-                font-size: 20px;
-                margin-bottom: 4px;
-            }
-
-            .chat-header p {
-                font-size: 12px;
-            }
-
-            .chat-messages {
-                padding: 10px;
-            }
-
-            .message {
-                margin-bottom: 10px;
-            }
-
-            .message-content {
-                padding: 10px 12px;
-                max-width: 85%;
-                font-size: 14px;
-            }
-
-            .avatar {
-                width: 32px;
-                height: 32px;
-                font-size: 14px;
-                margin-left: 8px;
-            }
-
-            .quick-replies {
-                padding: 8px;
-            }
-
-            .quick-replies h3 {
-                font-size: 12px;
-                margin-bottom: 4px;
-            }
-
-            .quick-btn {
-                padding: 4px 6px;
-                font-size: 10px;
-                border-radius: 8px;
-            }
-
-            .quick-buttons {
-                gap: 3px;
-            }
-
-            .chat-input {
-                padding: 8px;
-            }
-
-            .input-container {
-                gap: 3px;
-            }
-
-            .message-input {
-                padding: 10px 12px;
-                font-size: 14px;
-            }
-
-            .send-btn {
-                padding: 10px 15px;
-                font-size: 14px;
-            }
-
-            .form-container {
-                padding: 12px;
-                margin: 8px 0;
-            }
-
-            .form-field {
-                margin-bottom: 10px;
-            }
-
-            .form-field label {
-                font-size: 13px;
-                margin-bottom: 3px;
-            }
-
-            .form-field input, .form-field select {
-                padding: 8px 10px;
-                font-size: 13px;
-            }
-
-            .submit-form-btn {
-                padding: 10px 15px;
-                font-size: 14px;
-            }
-
-            .highlight {
-                padding: 10px;
-                margin: 8px 0;
-                font-size: 13px;
-            }
+        .input-field {
+            flex: 1;
+            padding: 12px 18px;
+            border: 2px solid #e9ecef;
+            border-radius: 22px;
+            font-size: 15px;
+            outline: none;
         }
-
-        /* התאמה לטלפונים קטנים מאוד */
-        @media (max-width: 480px) {
-            .chat-container {
-                max-width: 98vw;
-                height: 98vh;
-                border-radius: 10px;
-            }
-
-            .message-content {
-                max-width: 90%;
-                font-size: 13px;
-            }
-
-            .quick-btn {
-                padding: 3px 5px;
-                font-size: 9px;
-            }
+        .send-button {
+            padding: 12px 20px;
+            background: #8b2635;
+            color: white;
+            border: none;
+            border-radius: 22px;
+            cursor: pointer;
+        }
+        .quick-questions {
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+        }
+        .quick-question-btn {
+            display: inline-block;
+            margin: 3px;
+            padding: 6px 12px;
+            background: white;
+            border: 1px solid #8b2635;
+            color: #8b2635;
+            border-radius: 16px;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s ease;
+        }
+        .quick-question-btn:hover {
+            background: #8b2635;
+            color: white;
+            transform: translateY(-1px);
         }
     </style>
 </head>
 <body>
     <div class="chat-container">
         <div class="chat-header">
-            <h1>🏛️ מכון מקראות</h1>
-            <p>בוט החכם לליווי ועזרה אישית - כאן בשבילך!</p>
+            <h1>🎓 מכון מקראות</h1>
+            <p>בוט חכם לייעוץ ומידע</p>
         </div>
 
         <div class="chat-messages" id="chatMessages">
-            <div class="message bot">
-                <div class="avatar">🤖</div>
-                <div class="message-content">
-                    שלום! אני כאן בשבילך ❤️<br><br>
-                    אני הבוט של מכון מקראות, ואני כאן כדי לעזור לך למצוא בדיוק מה שאתה צריך. 
-                    בין אם מדובר על הילד שלך שמתקשה בקריאה, או שאתה עצמך רוצה לשפר, או שפשוט יש לך שאלות - 
-                    אני כאן לתת לך מענה חם ואישי.<br><br>
-                    <strong>איך אני יכול לעזור לך היום?</strong>
+            <div class="message bot-message">
+                <div class="message-bubble">
+                    שלום! 👋 אני הבוט החכם של מכון מקראות.<br>
+                    תוכלו לשאול אותי על המבדק 360°, מחירים, קופות חולים ועוד.<br><br>
+                    איך אוכל לעזור לכם היום? 😊
                 </div>
             </div>
         </div>
 
-        <div class="quick-replies">
-            <h3>👆 נושאים שכדאי שתכיר:</h3>
-            <div class="quick-buttons">
-                <button class="quick-btn" onclick="handleQuickReply('מבדק')">📋 המבדק המקיף 360°</button>
-                <button class="quick-btn" onclick="handleQuickReply('לימודים')">📚 סניפי הלימוד</button>
-                <button class="quick-btn" onclick="handleQuickReply('אונליין')">💻 הסניף האונליין (בנים ובנות)</button>
-                <button class="quick-btn" onclick="handleQuickReply('בנות')">👧 לימוד לבנות</button>
-                <button class="quick-btn" onclick="handleQuickReply('קשב')">🧠 קשב וריכוז</button>
-                <button class="quick-btn" onclick="handleQuickReply('מחירים')">💰 מחירים ועלויות</button>
-                <button class="quick-btn" onclick="handleQuickReply('הרצאות')">🎤 הרצאות</button>
-                <button class="quick-btn" onclick="handleQuickReply('תור')">📅 קביעת תור</button>
-            </div>
+        <div class="quick-questions">
+            <h4>שאלות מומלצות:</h4>
+            <span class="quick-question-btn" onclick="askQuestion('מה כולל המבדק?')">תוכן המבדק</span>
+            <span class="quick-question-btn" onclick="askQuestion('כמה עולה?')">מחירים</span>
+            <span class="quick-question-btn" onclick="askQuestion('קופות חולים')">קופות חולים</span>
+            <span class="quick-question-btn" onclick="askQuestion('לימוד אונליין')">אונליין</span>
+            <span class="quick-question-btn" onclick="openSchedulingBot()" style="background: #8b2635; color: white;">📅 קביעת תור</span>
         </div>
 
-        <div class="chat-input">
-            <div class="input-container">
-                <input type="text" class="message-input" id="messageInput" placeholder="כתוב לי כאן מה שמעניין אותך...">
-                <button class="send-btn" onclick="sendMessage()">שלח</button>
-            </div>
+        <div class="input-container">
+            <input type="text" id="userInput" class="input-field" placeholder="שאלו אותי כל שאלה..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button class="send-button" onclick="sendMessage()">שלח</button>
         </div>
     </div>
 
     <script>
-        const chatMessages = document.getElementById('chatMessages');
-        const messageInput = document.getElementById('messageInput');
-
+        // מאגר תשובות משופרות וחמות
         const responses = {
-            מבדק: {
-                response: `אה, המבדק המקיף שלנו! 😊 זה באמת משהו מיוחד שאני גאה להציג לך.<br><br>
+            מבדק: `🔍 <strong>אני אסביר לכם על המבדק 360° - זה באמת מיוחד!</strong>
 
-                <div class="highlight">
-                <strong>🔍 מה אנחנו בודקים במבדק 360°:</strong><br>
-                • ראייה - קוצר/רוחק ראיה, מיקוד וחדות<br>
-                • שמיעה - בדיקה יסודית לשלילת בעיות<br>
-                • זיכרון ושליפה - חזותי ושמיעתי<br>
-                • קריאה מקצועית ומעמיקה<br>
-                • קשב וריכוז (עם בדיקת MOXO אם נצטרך)<br>
-                • גרפולוגיה - אבחון רגשי על בסיס כתב יד
-                </div>
+אני מבין שיש הרבה בלבול בנושא מבדקים, אז בואו נבין יחד מה בדיוק המבדק שלנו כולל ולמה הוא שונה מכל מה שיש בשוק.
 
-                למה זה כל כך חשוב? כי לפעמים הבעיה בקריאה לא נובעת מהקריאה עצמה! יכול להיות שהילד פשוט לא רואה טוב, או שיש לו קושי בזיכרון. אנחנו מאתרים את השורש האמיתי של הבעיה.<br><br>
+<strong>🎯 הגישה שלנו:</strong>
+במקום לנחש מה הבעיה, אנחנו בודקים 11 תחומים שונים! כן, שמעתם נכון - 11 תחומים מקיפים. זה נשמע הרבה, אבל זה בדיוק הסוד שלנו.
 
-                ⏰ משך: שעה עד שעה וחצי<br>
-                💰 עלות: 650 ₪ (כולל השתתפות קופות החולים!)<br>
-                🧠 תוספת MOXO: רק 100 ₪ נוספים<br><br>
+<strong>📋 מה בדיוק אנחנו בודקים? הנה הרשימה המלאה:</strong>
+1. פרטים בסיסיים: שם, גיל, שפה מדוברת, למה הגעתם אלינו
+2. היסטוריה: איך התפתחה הקריאה, מה עם הדיבור, האם היה גן שפה
+3. בריאות כללית: בדיקות עיניים ואוזניים, משקפיים, כפתורים
+4. קשב וריכוז: האם יש קשיים, תרופות, מה המצב
+5. ראייה מתקדמת: מיקוד ראייה, עומק, עין עצלה, צבעים
+6. זיכרון ושליפה: כולל בדיקת RAN המתקדמת
+7. הרושם המקצועי: מה המאבחן רואה במהלך הבדיקה
+8. הקריאה בפועל: מאותיות ותנועות ועד דגושים ורפים
+9. שטף וביטחון: האם הילד מנחש או קורא באמת
+10. המציאות בחיידר: מה אומרים עליו, האם יש תסכול
+11. הילד בעצמו: מה הוא אומר במילים שלו
 
-                רוצה שאספר לך עוד על משהו ספציפי?`,
-                suggestions: ['איך קובעים תור?', 'מה זה בדיקת MOXO?', 'האם זה מתאים לילד ביישן?', 'איפה זה מתקיים?']
-            },
+<strong>💡 למה זה כל כך חשוב?</strong>
+תראו, בניסיון שלנו, הרבה פעמים הבעיה לא היכן שחושבים. ילד שנראה שיש לו קשיי קריאה, אולי יש לו בעיית ראייה. ילד שנראה "עצלן", אולי יש לו קושי בקשב. זה בדיוק למה אנחנו בודקים הכול - כדי למצוא את הסיבה האמיתית!
 
-            לימודים: {
-                response: `וואו, הלימודים שלנו! ❤️ זה באמת הלב של מה שאנחנו עושים כאן.<br><br>
+<strong>⏰ פרטים מעשיים:</strong>
+• המבדק לוקח בערך שעה - בקצב נוח לילד
+• תוך 3-5 ימים תקבלו דו"ח מפורט ומקצועי
+• המחיר: 650 ש"ח (וכל הקופות משתתפות!)
 
-                <div class="highlight">
-                <strong>🏛️ הסניפים שלנו:</strong><br>
-                📍 ביתר עילית, מודיעין עילית, בית שמש<br>
-                💻 <strong>אונליין - הסניף הגדול שלנו ללא מגבלות מקום!</strong><br><br>
-                
-                מה שמיוחד אצלנו בכל הסניפים:<br>
-                • לימוד יומי של 45 דקות<br>
-                • שילוב 4 תוכנות תרגול + בינה מלאכותית<br>
-                • מבוסס על שינון חווייתי<br>
-                • צוות ותיק עם מעל 40 שנות ניסיון בשיטת ברנשטיין<br>
-                • <strong>מעל 95% הצלחה!</strong> 🎉<br><br>
+רוצים לדעת עוד משהו ספציפי? אני כאן בשבילכם! 😊`,
 
-                <strong>הסניף האונליין שלנו</strong> זה פריצת דרך אמיתית - לימוד אישי ממורים חיים, גמישות מלאה, ומושלם למי שרוצה דיסקרטיות או גר רחוק!
-                </div>
+            מחיר: `💰 <strong>בואו נדבר על מחירים - אני אהיה שקוף איתכם לגמרי</strong>
 
-                מתאים מגיל 5 ועד מבוגרים - כן, גם אם אתה מבוגר שרוצה לשפר את הקריאה, אנחנו כאן בשבילך!<br><br>
+אני יודע שמחירים זה תמיד נושא רגיש, במיוחד כשמדובר בילדים שלנו. אז בואו נשים הכול על השולחן בצורה ברורה וכנה.
 
-                המטרה שלנו היא לא רק לימוד קריאה, אלא חיזוק הזיכרון, השליפה והבנת הנקרא. זה תהליך שמשנה חיים! 💪<br><br>
+<strong>🎯 המבדק 360° המלא: 650 ש"ח</strong>
+זה כולל את כל 11 תחומי הבדיקה, דו"ח מקצועי מפורט, והמלצות טיפוליות מותאמות אישית. אני יודע שזה נשמע כמו הרבה כסף, אבל כשתחשבו שזה המפתח להבנת הילד שלכם - זה באמת השקעה שמשתלמת.
 
-                איזה מהסניפים הכי נוח בשבילך - הפיזיים או האונליין?`,
-                suggestions: ['ספר יותר על הסניף אונליין', 'כמה זמן לוקח התהליך?', 'מה המחיר?', 'איך זה עובד בפועל?']
-            },
+<strong>⚡ מבדק מוקסו נוסף: +100 ש"ח</strong>
+זה המבדק הכי מתקדם לקשב וריכוז שקיים היום. לא חובה, אבל אם יש חשד לקשיי קשב - זה יכול לחסוך לכם חודשים של ניחושים.
 
-            אונליין: {
-                response: `הסניף האונליין שלנו! 🚀 זה הסניף הכי גדול שלנו - ללא מגבלות גיאוגרפיות!<br><br>
+<strong>📚 הלימודים עצמם: במחירים ידידותיים במיוחד</strong>
+כאן אנחנו באמת עושים מאמץ להיות נגישים. המחירים משתנים לפי התוכנית, אבל תמיד בטווח שהורים יכולים להרשות לעצמם.
 
-                <div class="highlight">
-                <strong>💻 למה הסניף האונליין שלנו מיוחד:</strong><br>
-                • לימוד אישי ממורים חיים - לא סתם תוכנה!<br>
-                • זמין לכל מקום בעולם - ללא מגבלות מקום<br>
-                • <strong>מתאים לבנים ובנות!</strong> - הסניף היחיד שלנו שמקבל בנות<br>
-                • מושלם למי שרוצה דיסקרטיות<br>
-                • גמישות מלאה בזמנים<br>
-                • ללא נסיעות או מגבלות תחבורה<br>
-                • תרגול חווייתי בהנחיית "יהודהלע" - הדמות המלווה שלנו<br>
-                • אותה איכות מקצועית כמו בסניפים הפיזיים!
-                </div>
+<strong>🏥 החדשות הטובות - קופות החולים!</strong>
+כל קופות החולים משתתפות הן במבדקים והן בטיפולים:
+• כללית ✅ • מכבי ✅ • מאוחדת ✅ • לאומית ✅
 
-                הכי חשוב - זה מקצועי, בטוח, שקט ומכובד. בדיוק כמו בסניפים הפיזיים, אבל מהנוחות של הבית שלך! 🏠<br><br>
+<strong>💡 איך לקבל את הפרטים המדויקים?</strong>
+כל קופה עם תנאים קצת שונים, ונהלים שמשתנים מפעם לפעם. לכן הדרך הטובה ביותר היא לפנות למזכירות שלנו - הם יודעים בדיוק מה המצב העדכני עם הקופה שלכם.
 
-                המחיר, השיטה, והתוצאות - הכל זהה לסניפים הפיזיים. גם כאן יש השתתפות קופות החולים.<br><br>
+<strong>🤝 המסר החשוב:</strong>
+ההשתתפות של קופות החולים הופכת את השירותים שלנו להרבה יותר נגישים. אנחנו לא רוצים שהיבט כלכלי יעצור משפחות מלקבל את העזרה שהן צריכות.
 
-                הסניף הזה מתאים במיוחד לתושבי פריפריה, לאנשים עסוקים, למשפחות עם בנות, ולמי שמעדיף פרטיות. זה נשמע רלוונטי בשבילך?`,
-                suggestions: ['איך מתחילים?', 'מה ההבדל מהסניפים הפיזיים?', 'זה מתאים למבוגרים?', 'איך קובעים?']
-            },
+יש לכם שאלות על התחשיבים? אני כאן לעזור! 😊`,
 
-            קשב: {
-                response: `קשב וריכוז - נושא שכל כך הרבה הורים שואלים עליו! 🧠 אני מבין בדיוק למה.<br><br>
+            קופות: `🏥 <strong>קופות חולים - בשורות טובות לכל המשפחות!</strong>
 
-                <div class="highlight">
-                <strong>🔬 בדיקת MOXO - מה זה בעצם:</strong><br>
-                זו בדיקה מתקדמת שנותנת תוצאות מעמיקות על:<br>
-                • רמת הקשב והיכולת להתמקד<br>
-                • תזמון ומהירות תגובה<br>
-                • אימפולסיביות<br>
-                • היפראקטיביות<br><br>
-                
-                💰 עלות: רק 100 ₪ נוספים למבדק הרגיל
-                </div>
+אני יודע שהנושא הכלכלי הוא אחד הדברים שהכי מעסיקים הורים, ויש לי בשורות טובות בשבילכם!
 
-                מה שחשוב להבין - לפעמים מה שנראה כמו "קושי בקריאה" הוא בעצם קושי בקשב. וברגע שאנחנו מזהים את זה נכון, אנחנו יכולים לטפל בזה בצורה הנכונה!<br><br>
+<strong>✅ כל קופות החולים משתתפות בעלויות:</strong>
+• קופת חולים כללית ✅
+• מכבי שירותי בריאות ✅  
+• קופת חולים מאוחדת ✅
+• קופת חולים לאומית ✅
 
-                הרב אפרים שבדרון, המנהל שלנו, נותן הרצאות מדהימות על הנושא הזה. הוא מביא הדמיות מוח חיות שמראות איך הילד חווה את הסביבה מבפנים. זה פשוט פותח עיניים! 👁️<br><br>
+<strong>🎯 ההשתתפות כוללת:</strong>
+• <strong>המבדקים:</strong> המבדק 360° ומבדק מוקסו
+• <strong>הטיפולים:</strong> תוכניות הלימוד והטיפול שלנו
 
-                יש לך חשד לקושי קשב? או שאתה רק רוצה לוודא?`,
-                suggestions: ['איך עושים את הבדיקה?', 'זה כואב לילד?', 'מתי מומלץ לעשות?', 'ספר על ההרצאות']
-            },
+<strong>💡 מה חשוב לדעת:</strong>
+כל קופה יכולה להיות עם תנאים ונהלים קצת שונים, וזה משתנה מפעם לפעם. לכן אני לא אכנס כאן לפרטים ספציפיים שיכולים להטעות אתכם.
 
-            מחירים: {
-                response: `בוא נדבר על המחירים בכנות ובשקיפות מלאה 💰<br><br>
+<strong>📞 הדרך הטובה ביותר לקבל מידע מדויק:</strong>
+פנו למזכירות שלנו! הצוות שלנו מכיר בדיוק את המצב העדכני עם כל קופה, ויכול לתת לכם מידע מדויק ועדכני שמתאים בדיוק לקופה שלכם ולמצב שלכם.
 
-                <div class="highlight">
-                <strong>💵 מחירון מלא:</strong><br><br>
-                
-                <strong>🔍 המבדק המקיף 360°:</strong><br>
-                • מבדק בסיסי: 650 ₪ (כולל השתתפות כל קופות החולים!)<br>
-                • תוספת בדיקת MOXO: +100 ₪ בלבד<br><br>
+<strong>🤝 הנקודה החשובה:</strong>
+ההשתתפות של קופות החולים הופכת את השירותים שלנו להרבה יותר נגישים למשפחות. זה חלק מהמחויבות שלנו לעזור לכל ילד, ללא קשר למצב הכלכלי של המשפחה.
 
-                <strong>📚 לימוד קריאה:</strong><br>
-                • בסניף או אונליין: אותו מחיר<br>
-                • כולל השתתפות קופות החולים<br>
-                • 45 דקות יומיות + 4 תוכנות תרגול<br><br>
+רוצים לדעת בדיוק מה התנאים עבור הקופה שלכם? פנו למזכירות ותקבלו את כל הפרטים! 😊`,
 
-                <strong>🎤 הרצאות:</strong><br>
-                • מחיר משתנה לפי קבוצה וגודל אירוע
-                </div>
+            גרפולוגיה: `🎨 <strong>גרפולוגיה - הציור וכתב היד שמספרים את הסיפור</strong>
 
-                מה שחשוב לי שתדע - אנחנו עובדים עם כל קופות החולים, אז חלק מהעלות חוזר אליך! 🎯<br><br>
+זה חלק מהיר ומעניין במיוחד במבדק שלנו! הילדים בדרך כלל אוהבים את החלק הזה.
 
-                גם אם המצב הכלכלי קצת לוחץ, בוא נדבר. לפעמים אפשר למצוא פתרונות. הכי חשוב לנו זה שהילד יקבל את מה שהוא צריך! ❤️<br><br>
+<strong>🖍️ מה אנחנו מבקשים מהילד לצייר?</strong>
+ציור אחד עם 4 אלמנטים חובה:
+• <strong>שמש</strong> ☀️
+• <strong>בית</strong> 🏠
+• <strong>עץ</strong> 🌳
+• <strong>איש</strong> 👤
 
-                איזה שירות מעניין אותך הכי הרבה?`,
-                suggestions: ['ספר על השתתפות הקופות', 'יש הנחות למשפחות?', 'איך משלמים?', 'מה כלול במחיר?']
-            },
+מעבר לזה הילד יכול להוסיף כל מה שרוצה - פרחים, ציפורים, עננים, כל מה שהדמיון שלו מכתיב!
 
-            הרצאות: {
-                response: `ההרצאות של הרב אפרים שבדרון! 🎤 זה באמת משהו שכדאי לחוות.<br><br>
+<strong>📝 חשוב מאוד - הנחיות לציור:</strong>
+• לצייר את כל האלמנטים על <strong>דף אחד</strong> (לא לחלק לכמה דפים)
+• דף <strong>A4 רגיל</strong> - בלי שורות, בלי משבצות, דף חלק
+• <strong>לא לעזור לילד!</strong> תנו לו לצייר לבד על פי הדמיון שלו
+• מומלץ לצייר בעפרונות צבעוניים (לא חובה)
 
-                <div class="highlight">
-                <strong>🎯 למי זה מתאים:</strong><br>
-                • הורים שמתלבטים<br>
-                • מורים ומחנכים<br>
-                • צוותי חינוך<br>
-                • כל מי שרוצה להבין יותר על קשיי למידה<br><br>
+<strong>✍️ כתב יד - חלק נוסף חשוב:</strong>
+מומלץ מאוד להביא גם דוגמה של כתב היד של הילד:
+• כ-10 שורות של כתב יד טבעי
+• <strong>התוכן לא חשוב כלל!</strong> יכול להיות העתקה מחומש, משניות, או כל טקסט אחר
+• הבדיקה נעשית רק על <strong>צורת הכתיבה</strong>, לא על מה שכתוב
 
-                <strong>💡 הנושאים שהוא מכסה:</strong><br>
-                • איך לזהות את מקור הקושי האמיתי<br>
-                • מתי הבעיה לא בקריאה אלא במקום אחר<br>
-                • איך להגיב נכון לילד מתקשה<br>
-                • הדרכה מעשית להורים<br>
-                • הדמיות מוח חיות שמראות איך הילד חווה את העולם
-                </div>
+<strong>📋 איך זה עובד במבדק?</strong>
+• <strong>מכינים את הציור מראש בבית</strong> ומביאים אותו למבדק
+• מביאים גם את דוגמת כתב היד שהכנתם מראש
+• אנחנו שולחים את החומר לבדיקה גרפולוגית מקצועית
+• מעבירים לכם את התוצאות בהקדם
 
-                זה לא סתם הרצאה יבשה! הרב שבדרון מביא מאות מקרים אמיתיים, סיפורים מרגשים, וכלים פרקטיים שאפשר ליישם מיד.<br><br>
+<strong>💡 למה זה כל כך חשוב?</strong>
+לפעמים הילד מספר את הסיפור של עצמו דרך הציור וכתב היד בצורה שמילים לא יכולות להביע. זה יכול להשלים את התמונה המלאה במבדק ולעזור לנו להבין טוב יותר את הילד.
 
-                הדבר הכי חזק זה ההדמיות של המוח. לראות איך הילד שלך חווה את הכיתה מבפנים - זה פשוט משנה הכל! 🧠✨<br><br>
+<strong>🎯 התוצאה:</strong>
+מידע נוסף חשוב על אישיות הילד, רגשות, חוזקות וקשיים - שיעזור לנו להתאים את הטיפול בצורה המדויקת ביותר.
 
-                רוצה שאעזור לך להזמין הרצאה לקבוצה שלך?`,
-                suggestions: ['איך מזמינים הרצאה?', 'אפשר גם בזום?', 'מה העלות?', 'כמה זמן זה לוקח?']
-            },
+זה באמת מוסיף נדבך משמעותי למבדק השלם! 🌟`,
 
-            תור: {
-                response: `בוא נקבע לך תור! 📅 אני שמח לעזור לך עם זה.<br><br>
+            אונליין: `💻 <strong>לימודים אונליין - הפתרון המתקדם שכבש את העולם</strong>
 
-                כדי שנוכל לתת לך את השירות הכי טוב, אני צריך קצת פרטים בסיסיים. אל תדאג, זה מהיר וקל! 😊<br><br>
+תקשיבו, אני אגיד לכם משהו - כשהתחלנו עם הלימודים האונליין, אפילו אנחנו לא האמנו שזה יעבוד כל כך טוב. אבל התוצאות פשוט מדהימות!
 
-                <div id="appointmentForm" class="form-container">
-                    <div class="form-field">
-                        <label>שם פרטי: *</label>
-                        <input type="text" id="firstName" required>
-                    </div>
-                    <div class="form-field">
-                        <label>שם משפחה: *</label>
-                        <input type="text" id="lastName" required>
-                    </div>
-                    <div class="form-field">
-                        <label>עיר מגורים: *</label>
-                        <input type="text" id="city" required>
-                    </div>
-                    <div class="form-field">
-                        <label>בן / בת: *</label>
-                        <select id="gender" required onchange="updateBranchOptions()">
-                            <option value="">בחר/י</option>
-                            <option value="בן">בן</option>
-                            <option value="בת">בת</option>
-                        </select>
-                    </div>
-                    <div class="form-field">
-                        <label>גיל: *</label>
-                        <input type="number" id="age" required>
-                    </div>
-                    <div class="form-field">
-                        <label>מוסד לימודים:</label>
-                        <input type="text" id="school">
-                    </div>
-                    <div class="form-field">
-                        <label>שפת הקריאה: *</label>
-                        <select id="language" required>
-                            <option value="">בחר/י</option>
-                            <option value="לשון הקודש">לשון הקודש</option>
-                            <option value="עברית">עברית</option>
-                            <option value="חסידית">חסידית</option>
-                        </select>
-                    </div>
-                    <div class="form-field">
-                        <label>מספר טלפון: *</label>
-                        <input type="tel" id="phone" required>
-                    </div>
-                    <div class="form-field">
-                        <label>סניף מועדף: *</label>
-                        <select id="branch" required>
-                            <option value="">בחר/י בן/בת קודם</option>
-                        </select>
-                    </div>
-                    <button class="submit-form-btn" onclick="submitAppointment()">שלח בקשה לקביעת תור</button>
-                </div>
+<strong>🌟 מה זה בעצם לימודים אונליין אצלנו?</strong>
+זה בדיוק כמו שהילד מגיע למכון - אותו מורה מנוסה, אותם תרגילים מדויקים, אותה איכות. רק שהכול מתרחש דרך המסך. לא קטעי וידיו, לא משחקים מוכנים מראש - זה אינטראקציה אמיתית!
 
-                אל תדאג, ברגע שתשלח את הפרטים, המומחים שלנו יחזרו אליך תוך 24 שעות לתיאום התור הכי נוח בשבילך! 🤝`,
-                suggestions: ['יש עוד שאלות על המבדק', 'מה קורה אחרי שאשלח?', 'כמה זמן לחכות לתור?', 'אפשר לבטל אם נצטרך?']
-            }
+<strong>🏠 למי זה מתאים במיוחד?</strong>
+• <strong>מבוגרים שרוצים פרטיות:</strong> אנשים שלא נוח להם להגיע פיזית למכון
+• <strong>תושבי פריפריה:</strong> משפחות שהמכון רחוק מהם שעות נסיעה
+• <strong>לוחות זמנים עמוסים:</strong> כשקשה לתאם הגעה למכון
+• <strong>מצבים מיוחדים:</strong> ילדים חרדים, מבוכים, או עם צרכים מיוחדים
+
+<strong>🌍 הפריצה הגלובלית:</strong>
+המערכת שלנו חוצה ערים, מדינות ואפילו יבשות! יש לנו תלמידים שלומדים מלונדון, מניו יורק, ומכל פינה בעולם. זה משהו שפשוט לא היה אפשרי לפני כמה שנים.
+
+<strong>🛡️ הפרטיות המלאה:</strong>
+אחד היתרונות הגדולים - מבוגרים שמתביישים, ילדים שלא רוצים שיידעו עליהם, כולם יכולים ללמוד בשקט, בבטחון, מבלי שאיש יידע.
+
+<strong>📊 התוצאות שמדברות בעד עצמן:</strong>
+מעל 95% הצלחה! כן, שמעתם נכון. מבוגרים שנאבקו שנים עם קריאה, פתאום מתחילים לקרוא. ילדים שהיו מתוסכלים, הופכים לקוראים נלהבים.
+
+<strong>💰 והחלק הכי טוב:</strong>
+אותו מחיר בדיוק כמו לימודים במכון, עם השתתפות קופות החולים!
+
+<strong>🎪 איך זה עובד עם יהודהלע?</strong>
+יהודהלע, הדמות התלת-ממדית שלנו, עובד גם באונליין! הילדים רואים אותו על המסך, הוא מדבר איתם, מעודד אותם - זה ממש כמו שהוא יושב לידם בחדר.
+
+רוצים לדעת איך זה עובד בפועל? שאלו אותי כל מה שמעניין אתכם! 😊`,
+
+            כללי: `🎓 <strong>ברוכים הבאים למכון מקראות - אני שמח שהגעתם אלינו!</strong>
+
+אני יודע שאתם כאן כי יש לכם ילד או קרוב משפחה שמתקשה בקריאה, ואני רוצה שתדעו - אתם הגעתם למקום הנכון.
+
+<strong>🌟 החזון שלנו פשוט ובהיר:</strong>
+להיות הכתובת הכי מקצועית, הכי נעימה, והכי בטוחה עבור כל ילד, נער או מבוגר שאיבד תקווה בקריאה. כן, גם מבוגרים - אנחנו פה בשביל כולם!
+
+<strong>🏢 איפה אנחנו נמצאים?</strong>
+יש לכם מספר אפשרויות נהדרות:
+• <strong>ביתר עילית</strong> - המכון המרכזי שלנו
+• <strong>בית שמש</strong> - סניף מקצועי ונוח
+• <strong>מודיעין עילית</strong> - לתושבי האזור  
+• <strong>אונליין</strong> - מכל מקום בעולם!
+
+<strong>💡 מה אנחנו מציעים?</strong>
+• <strong>המבדק 360°:</strong> הבדיקה הכי מקיפה שיש (650 ש"ח)
+• <strong>מבדק מוקסו:</strong> לקשיי קשב וריכוז (+100 ש"ח)  
+• <strong>לימודים עם יהודהלע:</strong> הדמות התלת-ממדית שהילדים אוהבים
+• <strong>לימודים בסניפים ואונליין:</strong> בחרו מה הכי נוח לכם
+• <strong>תמיכה מלאה:</strong> כל קופות החולים משתתפות במבדקים ובטיפולים!
+
+<strong>🤗 למה אנחנו שונים?</strong>
+תראו, יש הרבה מקומות שמבטיחים דברים. אנחנו לא מבטיחים - אנחנו עושים. 95% מהילדים שמגיעים אלינו יוצאים כשהם יודעים לקרוא. זה לא סיסמה שיווקית, זה מציאות.
+
+<strong>📞 מוכנים לקחת את הצעד הבא?</strong>
+<button onclick="openSchedulingBot()">📅 קביעת תור למבדק</button>
+<button onclick="contactUs()">📱 יצירת קשר ויעוץ</button>
+
+<strong>💬 יש לכם שאלות?</strong>
+אני כאן בשבילכם! שאלו אותי על כל מה שמעניין אתכם - המבדק, המחירים, הלימודים בסניפים או באונליין, או כל דבר אחר. אני אתן לכם תשובות כנות ומעשיות.
+
+בואו נעזור לילד שלכם לגלות את החוויה הנפלאה של קריאה! 😊`
         };
 
-        function addMessage(content, isUser = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+        // פונקציה לזיהוי תשובה עם AI מתקדם
+        function getResponse(question) {
+            const q = question.toLowerCase();
             
-            if (isUser) {
-                messageDiv.innerHTML = `
-                    <div class="message-content">${content}</div>
-                `;
-            } else {
-                messageDiv.innerHTML = `
-                    <div class="avatar">🤖</div>
-                    <div class="message-content">${content}</div>
-                `;
+            // AI מתקדם - ניתוח כוונה ותשובות מותאמות אישית
+            
+            // שאלות על חשיבות ו"למה"
+            if (q.includes('למה') || q.includes('מדוע') || q.includes('איך זה עוזר') || q.includes('מה התועלת')) {
+                if (q.includes('מבדק') || q.includes('אבחון')) {
+                    return {
+                        text: `🧠 <strong>למה כל כך חשוב לעשות מבדק לפני תחילת הלימודים?</strong>
+
+<strong>🎯 הסיבה המרכזית:</strong>
+חשוב מאוד לדעת מה הסיבה שהילד מתקשה בקריאה לפני תחילת הלימודים.
+
+<strong>🤔 מה יכול להיות הגורם?</strong>
+• אולי יש לו קושי בראיה
+• אולי יש לו קושי במיקוד ראיה  
+• אולי יש לו קושי בשמיעה
+• אולי יש לו קושי בקשב וריכוז
+• יכולים להיות גורמים נוספים
+
+<strong>💡 למה זה קריטי?</strong>
+רק כשיודעים את הסיבה האמיתית אפשר לתת טיפול מדויק ויעיל. בלי זה עלולים לבזבז חודשים על טיפולים שלא מתאימים!
+
+<strong>🎪 זה בדיוק למה המבדק שלנו נקרא "360°"</strong>
+כי אנחנו בודקים את הילד מכל הזוויות - לא רק הקריאה עצמה!`,
+                        showAI: true
+                    };
+                }
+            }
+
+            // שאלות על הבדלים והשוואות
+            if (q.includes('הבדל') || q.includes('לעומת') || q.includes('יותר טוב') || q.includes('למה לא')) {
+                if (q.includes('אונליין') || q.includes('מרחוק')) {
+                    return {
+                        text: `💻 <strong>למה לבחור לימודים אונליין? איך זה שונה מלימודים במכון?</strong>
+
+<strong>🎯 עובדה חשובה:</strong>
+הלימודים האונליין הם בדיוק כמו במכון - עם אותו מורה, אותם תרגילים, אותה איכות!
+
+<strong>🏠 למי מתאים אונליין במיוחד?</strong>
+• מבוגרים שרוצים שמירה על פרטיות
+• תושבי פריפריה ומקומות רחוקים  
+• מי שרוצה לחסוך בנסיעות ובזמן
+• למי שיש לוח זמנים גמיש
+
+<strong>📊 התוצאות המדהימות:</strong>
+מעל 95% הצלחה גם למתקשים ברמה גבוהה - הלימודים באונליין חוצים ימים ומדינות!
+
+<strong>💰 מחיר:</strong>
+בדיוק אותו מחיר כמו לימודים במכון, עם אותה השתתפות קופות חולים.
+
+זה לא פחות טוב - זה פשוט נוח יותר! 🌟`,
+                        showAI: true
+                    };
+                }
+            }
+
+            // שאלות על תוצאות והצלחה
+            if (q.includes('תוצאות') || q.includes('הצלחה') || q.includes('עובד') || q.includes('יעיל') || q.includes('מצליח')) {
+                return {
+                    text: `📊 <strong>התוצאות של מכון מקראות - מה שהמספרים מספרים</strong>
+
+<strong>🎯 נתוני הצלחה מרשימים:</strong>
+<strong style="color: #8b2635; font-size: 16px;">מעל 95% הצלחה גם למתקשים ברמה גבוהה!</strong>
+
+<strong>💻 באונליין במיוחד:</strong>
+התוצאות מדהימות - הלימודים מרחוק מוכיחים את עצמם עם מספרים גבוהים במיוחד של הצלחות.
+
+<strong>🌍 מדוע זה עובד כל כך טוב?</strong>
+• המבדק 360° מזהה בדיוק את הבעיה האמיתית
+• הטיפול מותאם אישית לכל ילד
+• יהודהלע הופך את הלמידה למהנה
+• מעקב צמוד והתאמות לפי התקדמות
+
+<strong>🎓 החזון שמוביל להצלחה:</strong>
+לאפשר לכל ילד, נער או מבוגר ללמוד לקרוא באמת – בשלבים, בביטחון, ובהנאה.
+
+זה לא רק מכון - זה מקום שבו חוזרת התקווה! ✨`,
+                    showAI: true
+                };
+            }
+
+            if (q.includes('מבדק') || q.includes('אבחון') || q.includes('כולל')) {
+                return { text: responses.מבדק, showAI: true };
+            }
+            if (q.includes('גרפולוגיה') || q.includes('ציור') || q.includes('ציורים') || q.includes('כתב יד') || q.includes('כתיבה') || q.includes('בית') || q.includes('שמש') || q.includes('עץ') || q.includes('איש') || (q.includes('דף') && q.includes('a4'))) {
+                return { text: responses.גרפולוגיה, showAI: true };
+            }
+            if (q.includes('מחיר') || q.includes('עולה') || q.includes('כמה')) {
+                return { text: responses.מחיר, showAI: true };
+            }
+            if (q.includes('קופות') || q.includes('השתתפות')) {
+                return { text: responses.קופות, showAI: true };
+            }
+            if (q.includes('אונליין') || q.includes('מרחוק')) {
+                return { text: responses.אונליין, showAI: true };
             }
             
-            chatMessages.appendChild(messageDiv);
+            return { text: responses.כללי, showAI: false };
+        }
+
+        // פונקציה לשליחת הודעה
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage(message, true);
+            input.value = '';
+
+            setTimeout(() => {
+                const result = getResponse(message);
+                addMessage(result.text, false, result.showAI);
+            }, 1000);
+        }
+
+        // פונקציה להוספת הודעה עם גלילה יציבה ומחוזקת
+        function addMessage(text, isUser, showAI = false) {
+            const container = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
             
-            // עבור הודעות הבוט - גלילה כך שהשורה הראשונה תהיה במרכז הדף
-            if (!isUser) {
-                setTimeout(() => {
-                    const containerHeight = chatMessages.clientHeight;
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            
+            if (showAI && !isUser) {
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'ai-indicator';
+                aiDiv.innerHTML = '🧠 תשובה חכמה מותאמת אישית';
+                bubble.appendChild(aiDiv);
+            }
+            
+            const content = document.createElement('div');
+            content.innerHTML = text.replace(/\n/g, '<br>');
+            bubble.appendChild(content);
+            
+            messageDiv.appendChild(bubble);
+            container.appendChild(messageDiv);
+            
+            // הגדרה יציבה מחוזקת לגלילה - השורה הראשונה תמיד תישאר במסך
+            setTimeout(() => {
+                if (isUser) {
+                    // משתמש - גלילה רגילה למטה
+                    container.scrollTop = container.scrollHeight;
+                } else {
+                    // בוט - גלילה מחוזקת שתבטיח שהשורה הראשונה תמיד נראית
+                    const containerHeight = container.clientHeight;
                     const messageTop = messageDiv.offsetTop;
-                    // כוונון כך שהשורה הראשונה תהיה במיקום נוח - 30% מלמעלה
-                    const targetScroll = messageTop - (containerHeight * 0.3);
                     
-                    chatMessages.scrollTo({
-                        top: Math.max(0, targetScroll),
+                    // הגדרה קבועה - השורה הראשונה תמיד תהיה 15px מהחלק העליון
+                    const targetPosition = messageTop - 15;
+                    
+                    container.scrollTo({
+                        top: Math.max(0, targetPosition),
                         behavior: 'smooth'
                     });
-                }, 100);
-            } else {
-                // עבור הודעות משתמש - גלילה רגילה לתחתית
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }, 50);
+            
+            // מנגנון גיבוי מחוזק - וודא שהשורה הראשונה תמיד נראית
+            if (!isUser) {
+                setTimeout(() => {
+                    const containerHeight = container.clientHeight;
+                    const containerScrollTop = container.scrollTop;
+                    const messageTop = messageDiv.offsetTop;
+                    
+                    // בדיקה אם השורה הראשונה מוסתרת
+                    const isFirstLineHidden = messageTop < containerScrollTop || messageTop > (containerScrollTop + containerHeight - 50);
+                    
+                    if (isFirstLineHidden) {
+                        // תיקון מיידי - העבר את השורה הראשונה למיקום נראה
+                        container.scrollTo({
+                            top: Math.max(0, messageTop - 15),
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 200);
+                
+                // בדיקה נוספת לאחר שניה
+                setTimeout(() => {
+                    const containerScrollTop = container.scrollTop;
+                    const messageTop = messageDiv.offsetTop;
+                    
+                    if (messageTop < containerScrollTop) {
+                        container.scrollTo({
+                            top: Math.max(0, messageTop - 15),
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 1000);
             }
         }
 
-        function showTyping() {
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message bot';
-            typingDiv.innerHTML = `
-                <div class="avatar">🤖</div>
-                <div class="typing-indicator" style="display: block;">
-                    <div class="typing-dots">
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
-                        <div class="typing-dot"></div>
+        // פונקציה לפתיחת טופס קביעת תור
+        function openSchedulingBot() {
+            const formHTML = `
+                <div style="background: white; padding: 15px; border-radius: 15px; max-width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    <div style="text-align: center; margin-bottom: 15px;">
+                        <h2 style="color: #8b2635; font-size: 18px; font-weight: bold; margin-bottom: 5px;">📋 טופס קביעת תור למבדק 360°</h2>
+                        <p style="color: #666; font-size: 13px; line-height: 1.4;">על מנת שנחזור אליכם לקביעת תור, אנא מלאו את הטופס הבא. המידע יעזור לנו להבין את הצורך ולהתאים את המבדק המתאים ביותר עבורכם.</p>
                     </div>
+
+                    <form id="appointmentForm">
+                        <!-- פרטי התלמיד -->
+                        <div style="margin-bottom: 10px;">
+                            <h3 style="color: #2c5f5f; font-size: 14px; font-weight: bold; margin-bottom: 5px;">👤 פרטי התלמיד</h3>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 3px;">
+                                <input type="text" id="firstName" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; direction: rtl;" placeholder="שם פרטי *" required>
+                                <input type="text" id="lastName" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; direction: rtl;" placeholder="שם משפחה *" required>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 3px;">
+                                <input type="text" id="city" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; direction: rtl;" placeholder="עיר מגורים *" required>
+                                <select id="gender" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; direction: rtl;" required>
+                                    <option value="">בן / בת *</option>
+                                    <option value="בן">בן</option>
+                                    <option value="בת">בת</option>
+                                </select>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 3px;">
+                                <input type="text" id="school" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; direction: rtl;" placeholder="מוסד לימודים *" required>
+                                <input type="text" id="grade" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; direction: rtl;" placeholder="כיתה *" required>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 3px;">
+                                <select id="readingLevel" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; direction: rtl;" required>
+                                    <option value="">הברת הקריאה *</option>
+                                    <option value="לא יודע לקרוא כלל">לא יודע לקרוא כלל</option>
+                                    <option value="קורא אותיות בודדות">קורא אותיות בודדות</option>
+                                    <option value="קורא הברות">קורא הברות</option>
+                                    <option value="קורא מילים קצרות">קורא מילים קצרות</option>
+                                    <option value="קורא משפטים קצרים">קורא משפטים קצרים</option>
+                                    <option value="קורא טקסט באיטיות">קורא טקסט באיטיות</option>
+                                    <option value="קורא בצורה תקינה">קורא בצורה תקינה</option>
+                                </select>
+                                <select id="language" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; direction: rtl;" required>
+                                    <option value="">סוג הקריאה *</option>
+                                    <option value="לשון הקודש">לשון הקודש</option>
+                                    <option value="עברית">עברית</option>
+                                    <option value="חסידית">חסידית</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- פרטי הטיפול -->
+                        <div style="margin-bottom: 10px;">
+                            <h3 style="color: #2c5f5f; font-size: 14px; font-weight: bold; margin-bottom: 5px;">📍 פרטי הטיפול וההורים</h3>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 3px;">
+                                <select id="branch" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; direction: rtl;" required>
+                                    <option value="">בחר סניף *</option>
+                                    <option value="ביתר עילית">ביתר עילית</option>
+                                    <option value="בית שמש">בית שמש</option>
+                                    <option value="מודיעין עילית">מודיעין עילית</option>
+                                    <option value="אונליין">אונליין</option>
+                                </select>
+                                <select id="relation" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; direction: rtl;" required>
+                                    <option value="">קירבה לתלמיד *</option>
+                                    <option value="אבא">אבא</option>
+                                    <option value="אמא">אמא</option>
+                                    <option value="אחר">אחר</option>
+                                </select>
+                            </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 3px;">
+                                <input type="tel" id="phone" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; direction: rtl;" placeholder="מספר טלפון *" required>
+                                <input type="email" id="email" style="padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 13px; direction: rtl;" placeholder="כתובת אימייל (אופציונלי)">
+                            </div>
+                        </div>
+
+                        <!-- מידע רפואי ופיתוחי -->
+                        <div style="margin-bottom: 10px;">
+                            <h3 style="color: #2c5f5f; font-size: 14px; font-weight: bold; margin-bottom: 5px;">🏥 מידע רפואי ופיתוחי <span style="color: #999; font-size: 11px; font-weight: normal;">(אופציונלי)</span></h3>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 3px;">
+                                <div style="display: flex; align-items: center; font-size: 12px;">
+                                    <input type="checkbox" id="languageKindergarten" style="margin-left: 5px;">
+                                    <label for="languageKindergarten">למד בגן שפה</label>
+                                </div>
+                                <div style="display: flex; align-items: center; font-size: 12px;">
+                                    <input type="checkbox" id="speechTherapy" style="margin-left: 5px;">
+                                    <label for="speechTherapy">טופל אצל קלינאית תקשורת</label>
+                                </div>
+                                <div style="display: flex; align-items: center; font-size: 12px;">
+                                    <input type="checkbox" id="eyeExam" style="margin-left: 5px;">
+                                    <label for="eyeExam">עבר בדיקת עיניים אצל מומחה</label>
+                                </div>
+                                <div style="display: flex; align-items: center; font-size: 12px;">
+                                    <input type="checkbox" id="hearingTest" style="margin-left: 5px;">
+                                    <label for="hearingTest">עבר בדיקת שמיעה</label>
+                                </div>
+                                <div style="display: flex; align-items: center; font-size: 12px;">
+                                    <input type="checkbox" id="earFluid" style="margin-left: 5px;">
+                                    <label for="earFluid">סבל מנוזלים באוזניים</label>
+                                </div>
+                                <div style="display: flex; align-items: center; font-size: 12px;">
+                                    <input type="checkbox" id="earSurgery" style="margin-left: 5px;">
+                                    <label for="earSurgery">עבר ניתוח כפתורים</label>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-bottom: 3px;">
+                                <div style="display: flex; align-items: center; font-size: 12px; margin-bottom: 5px;">
+                                    <input type="checkbox" id="adhdTests" style="margin-left: 5px;">
+                                    <label for="adhdTests">נעשו מבדקים קודמים לקשב וריכוז</label>
+                                </div>
+                                <textarea id="adhdDetails" style="width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 12px; direction: rtl; resize: vertical; min-height: 50px; margin-bottom: 3px;" placeholder="אם כן, ציין איזה מבדקים נעשו ומה התוצאות..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- הערה חשובה -->
+                        <div style="background: #f8f9fa; padding: 8px; border-radius: 5px; font-size: 12px; color: #666; margin-bottom: 10px; border-right: 3px solid #8b2635;">
+                            💡 <strong>חשוב לדעת:</strong> מבדק קריאה מחייב מלווה של אחד ההורים. חשוב ששני ההורים יהיו נוכחים במידת האפשר.
+                        </div>
+
+                        <!-- כפתורים -->
+                        <div style="text-align: center; margin-top: 15px;">
+                            <button type="button" onclick="submitSchedulingForm()" style="padding: 8px 20px; border: none; border-radius: 20px; font-size: 13px; cursor: pointer; margin: 0 5px; background: #8b2635; color: white;">📤 שלח בקשה</button>
+                            <button type="button" onclick="resetSchedulingForm()" style="padding: 8px 20px; border: none; border-radius: 20px; font-size: 13px; cursor: pointer; margin: 0 5px; background: #6c757d; color: white;">🔄 נקה טופס</button>
+                        </div>
+                    </form>
                 </div>
             `;
-            chatMessages.appendChild(typingDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
             
-            return typingDiv;
+            addMessage(formHTML, false, true);
         }
 
-        function generateContextualResponse(message) {
-            const lowerMessage = message.toLowerCase();
+        // פונקציה לשליחת הטופס
+        function submitSchedulingForm() {
+            // בדיקת תקינות השדות החובה
+            const requiredFields = ['firstName', 'lastName', 'city', 'gender', 'school', 'grade', 'readingLevel', 'language', 'branch', 'relation', 'phone'];
             
-            // בדיקת מילות מפתח
-            if (lowerMessage.includes('בנות') || lowerMessage.includes('ילדות') || lowerMessage.includes('בת ') || lowerMessage.includes('ילדה')) {
-                return {
-                    response: `אני שמח שאת/ה פונה לגבי בנות! 👧💕<br><br>
-
-                    <div class="highlight">
-                    <strong>🌟 לימוד קריאה לבנות במכון מקראות:</strong><br><br>
-                    
-                    בנות יכולות ללמוד אצלנו <strong>בסניף האונליין בלבד</strong> - וזה בעצם יתרון מדהים!<br><br>
-                    
-                    💻 <strong>למה הסניף האונליין מושלם לבנות:</strong><br>
-                    • פרטיות מלאה ונוחות הבית<br>
-                    • לימוד אישי ממורים מקצועיים<br>
-                    • גמישות מלאה בזמנים<br>
-                    • אותה איכות ותוצאות כמו בסניפים הפיזיים<br>
-                    • תרגול חווייתי עם "יהודהלע" - הדמות המלווה<br>
-                    • השתתפות קופות החולים
-                    </div>
-
-                    הרבה הורים מגלים שהלימוד האונליין אפילו יותר מתאים לבנות - יש פחות הסחות דעת, יותר מיקוד, והן מרגישות בנוח בסביבה הביתית.<br><br>
-
-                    מגיל 5 ועד מבוגרות - כולן מוזמנות! יש לנו הצלחות מדהימות עם בנות. 🎉<br><br>
-
-                    רוצה לשמוע עוד פרטים על איך זה עובד?`,
-                    suggestions: ['איך מתחילים באונליין?', 'מה המחיר לבנות?', 'כמה זמן התהליך?', 'איך קובעים תור למבדק?']
-                };
-            }
-            if (lowerMessage.includes('סניף') || lowerMessage.includes('סניפים')) {
-                return responses.לימודים;
-            }
-            if (lowerMessage.includes('הרצאה') || lowerMessage.includes('הרצאות')) {
-                return responses.הרצאות;
-            }
-            if (lowerMessage.includes('מבדק') || lowerMessage.includes('בדיקה') || lowerMessage.includes('360')) {
-                return responses.מבדק;
-            }
-            if (lowerMessage.includes('לימוד') || lowerMessage.includes('ללמוד') || lowerMessage.includes('קריאה')) {
-                return responses.לימודים;
-            }
-            if (lowerMessage.includes('אונליין') || lowerMessage.includes('מהבית') || lowerMessage.includes('מרחוק')) {
-                return responses.אונליין;
-            }
-            if (lowerMessage.includes('קשב') || lowerMessage.includes('ריכוז') || lowerMessage.includes('מוקסו') || lowerMessage.includes('moxo')) {
-                return responses.קשב;
-            }
-            if (lowerMessage.includes('מחיר') || lowerMessage.includes('עולה') || lowerMessage.includes('כסף') || lowerMessage.includes('עלות')) {
-                return responses.מחירים;
-            }
-            if (lowerMessage.includes('תור') || lowerMessage.includes('לקבוע') || lowerMessage.includes('פגישה')) {
-                return responses.תור;
-            }
-            if (lowerMessage.includes('אחרי שאשלח') || lowerMessage.includes('מה קורה אחרי') || lowerMessage.includes('אחרי הטופס') || lowerMessage.includes('אחרי שמלאתי')) {
-                return {
-                    response: `תודה שאתה שואל! 😊 זה חשוב לדעת מה קורה הלאה.<br><br>
-
-                    <div class="highlight">
-                    <strong>🤝 מה קורה אחרי שתשלח את הטופס:</strong><br><br>
-                    
-                    המזכיר שלנו יצור איתך קשר תוך 24 שעות מקבלת הטופס.<br><br>
-                    
-                    💡 <strong>חשוב!</strong> אנא הקפד להיות זמין לטלפון - נרצה לתאם איתך את התור המתאים ביותר ולענות על כל שאלה שתהיה לך.
-                    </div>
-
-                    המזכיר יסביר לך בדיוק מה צריך להכין למבדק, איך זה עובד, ויענה על כל השאלות שלך. הוא גם יעזור לך למצוא את המועד הכי נוח עבורכם.<br><br>
-
-                    אם בינתיים יש עוד שאלות, אני כאן! 🤗`,
-                    suggestions: ['איך מתכוננים למבדק?', 'מה לקחת איתנו?', 'כמה זמן התור?', 'אפשר לשנות מועד?']
-                };
-            }
-
-            // תגובות אישיות לפי הקשר
-            const personalResponses = [
-                {
-                    keywords: ['ביישן', 'פחד', 'חרדה', 'לא רוצה'],
-                    response: `אני מבין בדיוק את החששות שלך 💙<br><br>ילדים ביישנים זה משהו שאנחנו מכירים טוב מאוד! המומחים שלנו יודעים בדיוק איך להתחבר לילד בעדינות ולגרום לו להרגיש בנוח.<br><br>במבדק, ההורים נמצאים איתו כל הזמן, וכל הבדיקות נעשות בצורה משחקית וחמה. אף פעם לא בלחץ! 🤗<br><br>רוצה שאספר לך בדיוק איך אנחנו עובדים עם ילדים רגישים?`,
-                    suggestions: ['ספר איך זה עובד בפועל', 'כמה זמן זה לוקח?', 'האם ההורים נמצאים?', 'מה אם הוא לא ישתף פעולה?']
-                },
-                {
-                    keywords: ['מבוגר', 'בן 20', 'בן 30', 'גדול', 'מבוגרת'],
-                    response: `כל הכבוד שאתה לוקח אחריות על השיפור שלך! 👏<br><br>מבוגרים זה בעצם הקטע הכי מתגמל בעבודה שלנו. יש משהו מיוחד לראות איך אדם משנה את החיים שלו בגיל מבוגר.<br><br>הלימודים שלנו מתאימים מגיל 5 ועד... אין גיל עליון! יש לנו הצלחות מדהימות עם מבוגרים שרצו לשפר את הקריאה שלהם, הן מבחינה מקצועית והן אישית.<br><br>הלימוד אונליין מושלם בשבילך - דיסקרטיות מלאה, גמישות בזמנים, וכל זה מהנוחות של הבית! 🏠✨<br><br>מה המניע שלך לשיפור?`,
-                    suggestions: ['ספר על הלימוד אונליין', 'כמה זמן זה לוקח?', 'זה עובד גם למבוגרים?', 'איך מתחילים?']
-                },
-                {
-                    keywords: ['כאב', 'כואב', 'פחד מכאב', 'זריקה'],
-                    response: `אל תדאג בכלל! 😊 המבדק שלנו הוא 100% לא פולשני ובטוח לחלוטין.<br><br>אין כאן שום זריקות, שום כאב, שום דבר לא נעים! זה בעיקר משחקים, תרגילים על המחשב, קריאה, וכתיבה פשוטה.<br><br>הדבר הכי "מפחיד" זה אולי להסתכל דרך משקפיים מיוחדים לבדיקת הראייה - וגם זה כיף לילדים! 🤓<br><br>אני מבטיח לך שיותר "מפחיד" לך מאשר לילד. הם בדרך כלל נהנים! 😄`,
-                    suggestions: ['איך מתכוננים למבדק?', 'מה בדיוק עושים שם?', 'כמה זמן זה לוקח?', 'ההורים נמצאים?']
-                }
-            ];
-
-            for (let resp of personalResponses) {
-                if (resp.keywords.some(keyword => lowerMessage.includes(keyword))) {
-                    return resp;
+            for (let field of requiredFields) {
+                const element = document.getElementById(field);
+                if (!element || !element.value.trim()) {
+                    alert('❌ אנא מלאו את כל השדות החובה (מסומנים ב-*)');
+                    return;
                 }
             }
-
-            // תגובת ברירת מחדל אישית
-            return {
-                response: `תודה שפנית אלי! 😊 אני רוצה לתת לך תשובה הכי מדויקת שאפשר.<br><br>אני רואה שיש לך שאלה על "${message}" - ואני רוצה לעזור לך בדיוק עם מה שאתה צריך.<br><br>בינתיים, הנה כמה דברים שאולי יעניינו אותך:<br><br>🔍 <strong>המבדק המקיף שלנו</strong> - בודק הכל: ראייה, שמיעה, זיכרון, קריאה וקשב<br>📚 <strong>לימוד קריאה</strong> - בסניפים או אונליין עם 95% הצלחה<br>💰 <strong>מחירים שקופים</strong> - עם השתתפות קופות החולים<br><br>איך אני יכול לעזור לך הכי טוב?`,
-                suggestions: ['ספר על המבדק', 'מעניין אותי הלימוד', 'איך קובעים תור?', 'מה המחירים?']
+            
+            const formData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                city: document.getElementById('city').value,
+                gender: document.getElementById('gender').value,
+                school: document.getElementById('school').value,
+                grade: document.getElementById('grade').value,
+                readingLevel: document.getElementById('readingLevel').value,
+                language: document.getElementById('language').value,
+                branch: document.getElementById('branch').value,
+                relation: document.getElementById('relation').value,
+                phone: document.getElementById('phone').value,
+                email: document.getElementById('email').value,
+                languageKindergarten: document.getElementById('languageKindergarten').checked,
+                speechTherapy: document.getElementById('speechTherapy').checked,
+                eyeExam: document.getElementById('eyeExam').checked,
+                hearingTest: document.getElementById('hearingTest').checked,
+                earFluid: document.getElementById('earFluid').checked,
+                earSurgery: document.getElementById('earSurgery').checked,
+                adhdTests: document.getElementById('adhdTests').checked,
+                adhdDetails: document.getElementById('adhdDetails').value,
+                timestamp: new Date().toLocaleString('he-IL')
             };
+            
+            sendFormToOwner(formData);
         }
 
-        function updateQuickReplies(suggestions) {
-            const quickButtons = document.querySelector('.quick-buttons');
-            quickButtons.innerHTML = '';
-            
-            suggestions.forEach(suggestion => {
-                const btn = document.createElement('button');
-                btn.className = 'quick-btn';
-                btn.textContent = suggestion;
-                btn.onclick = () => handleQuickReply(suggestion);
-                quickButtons.appendChild(btn);
-            });
-        }
-
-        function handleQuickReply(topic) {
-            addMessage(topic, true);
-            
-            const typingElement = showTyping();
-            
-            setTimeout(() => {
-                chatMessages.removeChild(typingElement);
-                
-                let responseData;
-                if (responses[topic]) {
-                    responseData = responses[topic];
-                } else {
-                    responseData = generateContextualResponse(topic);
+        // פונקציה לניקוי הטופס
+        function resetSchedulingForm() {
+            if (confirm('האם אתה בטוח שברצונך לנקות את הטופס?')) {
+                const form = document.getElementById('appointmentForm');
+                if (form) {
+                    form.reset();
+                    alert('🔄 הטופס נוקה בהצלחה');
                 }
-                
-                addMessage(responseData.response);
-                if (responseData.suggestions) {
-                    updateQuickReplies(responseData.suggestions);
-                }
-            }, 1500);
-        }
-
-        function sendMessage() {
-            const message = messageInput.value.trim();
-            if (!message) return;
-            
-            addMessage(message, true);
-            messageInput.value = '';
-            
-            const typingElement = showTyping();
-            
-            setTimeout(() => {
-                chatMessages.removeChild(typingElement);
-                
-                const responseData = generateContextualResponse(message);
-                addMessage(responseData.response);
-                
-                if (responseData.suggestions) {
-                    updateQuickReplies(responseData.suggestions);
-                }
-            }, 1500);
-        }
-
-        function updateBranchOptions() {
-            const gender = document.getElementById('gender').value;
-            const branchSelect = document.getElementById('branch');
-            
-            // נקה אפשרויות קיימות
-            branchSelect.innerHTML = '<option value="">בחר/י סניף</option>';
-            
-            if (gender === 'בן') {
-                branchSelect.innerHTML += `
-                    <option value="ביתר עילית">ביתר עילית</option>
-                    <option value="מודיעין עילית">מודיעין עילית</option>
-                    <option value="בית שמש">בית שמש</option>
-                    <option value="אונליין">הסניף האונליין</option>
-                `;
-            } else if (gender === 'בת') {
-                branchSelect.innerHTML += `
-                    <option value="אונליין">הסניף האונליין (היחיד הפתוח לבנות)</option>
-                `;
             }
         }
 
-        function submitAppointment() {
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const city = document.getElementById('city').value;
-            const gender = document.getElementById('gender').value;
-            const age = document.getElementById('age').value;
-            const phone = document.getElementById('phone').value;
-            const language = document.getElementById('language').value;
-            const branch = document.getElementById('branch').value;
-
-            if (!firstName || !lastName || !city || !gender || !age || !phone || !language || !branch) {
-                addMessage('אופס! 😅 נראה שחסרים כמה פרטים חובה. תוכל למלא את כל השדות עם הכוכבית (*) ולנסות שוב?');
-                return;
+        function sendFormToOwner(formData) {
+            let message = `📋 בקשת תור חדשה!\n\n`;
+            message += `👤 פרטי התלמיד:\n`;
+            message += `שם: ${formData.firstName} ${formData.lastName}\n`;
+            message += `עיר: ${formData.city}\n`;
+            message += `מין: ${formData.gender}\n`;
+            message += `כיתה: ${formData.grade}\n`;
+            message += `מוסד לימודים: ${formData.school}\n`;
+            message += `הברת קריאה: ${formData.readingLevel}\n`;
+            message += `סוג קריאה: ${formData.language}\n\n`;
+            
+            message += `📍 פרטי הטיפול:\n`;
+            message += `סניף: ${formData.branch}\n`;
+            message += `קירבה לתלמיד: ${formData.relation}\n`;
+            message += `טלפון: ${formData.phone}\n`;
+            message += `אימייל: ${formData.email}\n\n`;
+            
+            if (formData.languageKindergarten || formData.speechTherapy || formData.eyeExam || formData.hearingTest || formData.earFluid || formData.earSurgery || formData.adhdTests) {
+                message += `🏥 מידע רפואי:\n`;
+                if (formData.languageKindergarten) message += `• למד בגן שפה\n`;
+                if (formData.speechTherapy) message += `• טופל אצל קלינאית תקשורת\n`;
+                if (formData.eyeExam) message += `• עבר בדיקת עיניים\n`;
+                if (formData.hearingTest) message += `• עבר בדיקת שמיעה\n`;
+                if (formData.earFluid) message += `• סבל מנוזלים באוזניים\n`;
+                if (formData.earSurgery) message += `• עבר ניתוח כפתורים\n`;
+                if (formData.adhdTests) message += `• עבר מבדקי קשב וריכוז\n`;
+                if (formData.adhdDetails) message += ` פרטים: ${formData.adhdDetails}\n`;
+                message += `\n`;
             }
+            
+            message += `⏰ זמן הבקשה: ${formData.timestamp}`;
+            
+            console.log('📋 בקשת תור מפורטת:', formData);
+            
+            // הודעת אישור למשתמש
+            const confirmationMessage = `✅ <strong>טופס נשלח בהצלחה!</strong>
 
-            const formData = `שם: ${firstName} ${lastName}\nעיר: ${city}\nבן/בת: ${gender}\nגיל: ${age}\nטלפון: ${phone}\nשפה: ${language}\nסניף: ${branch}`;
+<strong>📋 סיכום הבקשה:</strong>
+• תלמיד: ${formData.firstName} ${formData.lastName}
+• סניף: ${formData.branch}
+• טלפון: ${formData.phone}
+• זמן שליחה: ${formData.timestamp}
+
+<strong>📞 מה קורה עכשיו?</strong>
+• נציג המכון יצור עמכם קשר תוך 24 שעות
+• נקבע ביחד זמן נוח למבדק
+• תקבלו אישור לפי מספר הטלפון שהשארתם
+
+תודה שבחרתם במכון מקראות! 🎓`;
             
-            addMessage(`מושלם! 🎉 קיבלתי את הפרטים שלך:<br><br>${formData.replace(/\n/g, '<br>')}<br><br>המומחים שלנו יחזרו אליך תוך 24 שעות לתיאום התור המתאים ביותר!<br><br>בינתיים, אם יש עוד שאלות - אני כאן בשבילך! ❤️`);
-            
-            updateQuickReplies(['יש עוד שאלות על המבדק', 'ספר על התהליך', 'מה המחירים?', 'איך מתכוננים?']);
+            addMessage(confirmationMessage, false, true);
         }
 
-        // Event listeners
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
-        });
+        // פונקציה ליצירת קשר ויעוץ
+        function contactUs() {
+            const contactMessage = `📱 <strong>יצירת קשר ויעוץ מקצועי</strong>
 
-        // Auto-focus על תיבת הטקסט
-        messageInput.focus();
+<strong>💬 אנחנו כאן בשבילכם!</strong>
+
+<strong>📞 דרכי יצירת קשר:</strong>
+• טלפון ישיר: [מספר טלפון]
+• ווטסאפ: [מספר ווטסאפ]
+• אימייל: [כתובת מייל]
+• כתובת: [כתובת המכון]
+
+<strong>⏰ זמני פעילות:</strong>
+• ימים א'-ה': 8:00-18:00
+• יום ו': 8:00-13:00
+• מענה מיידי בווטסאפ ברוב השעות
+
+<strong>🎯 שירותי יעוץ חינמיים:</strong>
+• יעוץ ראשוני על קשיי קריאה
+• הכוונה בבחירת המבדק המתאים
+• הסברים על התהליך והזמנים
+• מענה לכל השאלות שלכם
+
+<strong>💡 טיפ:</strong>
+אתם מוזמנים לשלוח הודעת ווטסאפ עם השאלות שלכם - נחזור אליכם במהירות!
+
+כאן בשבילכם תמיד! 🌟`;
+            
+            addMessage(contactMessage, false, true);
+        }
+
+        // פונקציה לשאלה מהירה
+        function askQuestion(question) {
+            document.getElementById('userInput').value = question;
+            sendMessage();
+        }
+
+        // התחלה
+        document.getElementById('userInput').focus();
     </script>
 </body>
 </html>
