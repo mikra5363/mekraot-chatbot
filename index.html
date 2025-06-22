@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מכון מקראות - בוט אישי</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 540px;
+            height: 90vh;
+            max-height: 900px;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #B71C1C, #37474F);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .chat-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.bot {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .message.user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 12px;
+            background: linear-gradient(135deg, #B71C1C, #37474F);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .message-content {
+            background: white;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 70%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            line-height: 1.6;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #37474F, #263238);
+            color: white;
+        }
+
+        .quick-replies {
+            padding: 10px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .quick-replies h3 {
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 13px;
+        }
+
+        .quick-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .quick-btn {
+            background: white;
+            border: 2px solid #B71C1C;
+            color: #B71C1C;
+            padding: 6px 9px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .quick-btn:hover {
+            background: #B71C1C;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(183, 28, 28, 0.3);
+        }
+
+        .chat-input {
+            padding: 10px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 5px;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #eee;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        .message-input:focus {
+            border-color: #B71C1C;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #B71C1C, #37474F);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: transform 0.2s ease;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 18px;
+            max-width: 70%;
+            margin-bottom: 20px;
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #B71C1C;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: scale(1) translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: scale(1.2) translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .form-container {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 15px 0;
+        }
+
+        .form-field {
+            margin-bottom: 15px;
+        }
+
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .form-field input, .form-field select {
+            width: 100%;
+            padding: 10px 15px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .form-field input:focus, .form-field select:focus {
+            outline: none;
+            border-color: #B71C1C;
+        }
+
+        .submit-form-btn {
+            background: linear-gradient(135deg, #B71C1C, #37474F);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #f5f0f2 0%, #f5f0f2 100%);
+            padding: 15px;
+            border-radius: 10px;
+            border-right: 4px solid #B71C1C;
+            margin: 10px 0;
+        }
+
+        /* התאמה לטלפון נייד */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .chat-container {
+                max-width: 95vw;
+                height: 95vh;
+                max-height: none;
+                min-height: 500px;
+                border-radius: 15px;
+            }
+
+            .chat-header {
+                padding: 10px;
+            }
+
+            .chat-header h1 {
+                font-size: 20px;
+                margin-bottom: 4px;
+            }
+
+            .chat-header p {
+                font-size: 12px;
+            }
+
+            .chat-messages {
+                padding: 10px;
+            }
+
+            .message {
+                margin-bottom: 10px;
+            }
+
+            .message-content {
+                padding: 10px 12px;
+                max-width: 85%;
+                font-size: 14px;
+            }
+
+            .avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+                margin-left: 8px;
+            }
+
+            .quick-replies {
+                padding: 8px;
+            }
+
+            .quick-replies h3 {
+                font-size: 12px;
+                margin-bottom: 4px;
+            }
+
+            .quick-btn {
+                padding: 4px 6px;
+                font-size: 10px;
+                border-radius: 8px;
+            }
+
+            .quick-buttons {
+                gap: 3px;
+            }
+
+            .chat-input {
+                padding: 8px;
+            }
+
+            .input-container {
+                gap: 3px;
+            }
+
+            .message-input {
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+
+            .send-btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+
+            .form-container {
+                padding: 12px;
+                margin: 8px 0;
+            }
+
+            .form-field {
+                margin-bottom: 10px;
+            }
+
+            .form-field label {
+                font-size: 13px;
+                margin-bottom: 3px;
+            }
+
+            .form-field input, .form-field select {
+                padding: 8px 10px;
+                font-size: 13px;
+            }
+
+            .submit-form-btn {
+                padding: 10px 15px;
+                font-size: 14px;
+            }
+
+            .highlight {
+                padding: 10px;
+                margin: 8px 0;
+                font-size: 13px;
+            }
+        }
+
+        /* התאמה לטלפונים קטנים מאוד */
+        @media (max-width: 480px) {
+            .chat-container {
+                max-width: 98vw;
+                height: 98vh;
+                border-radius: 10px;
+            }
+
+            .message-content {
+                max-width: 90%;
+                font-size: 13px;
+            }
+
+            .quick-btn {
+                padding: 3px 5px;
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>🏛️ מכון מקראות</h1>
+            <p>בוט החכם לליווי ועזרה אישית - כאן בשבילך!</p>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <div class="avatar">🤖</div>
+                <div class="message-content">
+                    שלום! אני כאן בשבילך ❤️<br><br>
+                    אני הבוט של מכון מקראות, ואני כאן כדי לעזור לך למצוא בדיוק מה שאתה צריך. 
+                    בין אם מדובר על הילד שלך שמתקשה בקריאה, או שאתה עצמך רוצה לשפר, או שפשוט יש לך שאלות - 
+                    אני כאן לתת לך מענה חם ואישי.<br><br>
+                    <strong>איך אני יכול לעזור לך היום?</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-replies">
+            <h3>👆 נושאים שכדאי שתכיר:</h3>
+            <div class="quick-buttons">
+                <button class="quick-btn" onclick="handleQuickReply('מבדק')">📋 המבדק המקיף 360°</button>
+                <button class="quick-btn" onclick="handleQuickReply('לימודים')">📚 סניפי הלימוד</button>
+                <button class="quick-btn" onclick="handleQuickReply('אונליין')">💻 הסניף האונליין (בנים ובנות)</button>
+                <button class="quick-btn" onclick="handleQuickReply('בנות')">👧 לימוד לבנות</button>
+                <button class="quick-btn" onclick="handleQuickReply('קשב')">🧠 קשב וריכוז</button>
+                <button class="quick-btn" onclick="handleQuickReply('מחירים')">💰 מחירים ועלויות</button>
+                <button class="quick-btn" onclick="handleQuickReply('הרצאות')">🎤 הרצאות</button>
+                <button class="quick-btn" onclick="handleQuickReply('תור')">📅 קביעת תור</button>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <div class="input-container">
+                <input type="text" class="message-input" id="messageInput" placeholder="כתוב לי כאן מה שמעניין אותך...">
+                <button class="send-btn" onclick="sendMessage()">שלח</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+
+        const responses = {
+            מבדק: {
+                response: `אה, המבדק המקיף שלנו! 😊 זה באמת משהו מיוחד שאני גאה להציג לך.<br><br>
+
+                <div class="highlight">
+                <strong>🔍 מה אנחנו בודקים במבדק 360°:</strong><br>
+                • ראייה - קוצר/רוחק ראיה, מיקוד וחדות<br>
+                • שמיעה - בדיקה יסודית לשלילת בעיות<br>
+                • זיכרון ושליפה - חזותי ושמיעתי<br>
+                • קריאה מקצועית ומעמיקה<br>
+                • קשב וריכוז (עם בדיקת MOXO אם נצטרך)<br>
+                • גרפולוגיה - אבחון רגשי על בסיס כתב יד
+                </div>
+
+                למה זה כל כך חשוב? כי לפעמים הבעיה בקריאה לא נובעת מהקריאה עצמה! יכול להיות שהילד פשוט לא רואה טוב, או שיש לו קושי בזיכרון. אנחנו מאתרים את השורש האמיתי של הבעיה.<br><br>
+
+                ⏰ משך: שעה עד שעה וחצי<br>
+                💰 עלות: 650 ₪ (כולל השתתפות קופות החולים!)<br>
+                🧠 תוספת MOXO: רק 100 ₪ נוספים<br><br>
+
+                רוצה שאספר לך עוד על משהו ספציפי?`,
+                suggestions: ['איך קובעים תור?', 'מה זה בדיקת MOXO?', 'האם זה מתאים לילד ביישן?', 'איפה זה מתקיים?']
+            },
+
+            לימודים: {
+                response: `וואו, הלימודים שלנו! ❤️ זה באמת הלב של מה שאנחנו עושים כאן.<br><br>
+
+                <div class="highlight">
+                <strong>🏛️ הסניפים שלנו:</strong><br>
+                📍 ביתר עילית, מודיעין עילית, בית שמש<br>
+                💻 <strong>אונליין - הסניף הגדול שלנו ללא מגבלות מקום!</strong><br><br>
+                
+                מה שמיוחד אצלנו בכל הסניפים:<br>
+                • לימוד יומי של 45 דקות<br>
+                • שילוב 4 תוכנות תרגול + בינה מלאכותית<br>
+                • מבוסס על שינון חווייתי<br>
+                • צוות ותיק עם מעל 40 שנות ניסיון בשיטת ברנשטיין<br>
+                • <strong>מעל 95% הצלחה!</strong> 🎉<br><br>
+
+                <strong>הסניף האונליין שלנו</strong> זה פריצת דרך אמיתית - לימוד אישי ממורים חיים, גמישות מלאה, ומושלם למי שרוצה דיסקרטיות או גר רחוק!
+                </div>
+
+                מתאים מגיל 5 ועד מבוגרים - כן, גם אם אתה מבוגר שרוצה לשפר את הקריאה, אנחנו כאן בשבילך!<br><br>
+
+                המטרה שלנו היא לא רק לימוד קריאה, אלא חיזוק הזיכרון, השליפה והבנת הנקרא. זה תהליך שמשנה חיים! 💪<br><br>
+
+                איזה מהסניפים הכי נוח בשבילך - הפיזיים או האונליין?`,
+                suggestions: ['ספר יותר על הסניף אונליין', 'כמה זמן לוקח התהליך?', 'מה המחיר?', 'איך זה עובד בפועל?']
+            },
+
+            אונליין: {
+                response: `הסניף האונליין שלנו! 🚀 זה הסניף הכי גדול שלנו - ללא מגבלות גיאוגרפיות!<br><br>
+
+                <div class="highlight">
+                <strong>💻 למה הסניף האונליין שלנו מיוחד:</strong><br>
+                • לימוד אישי ממורים חיים - לא סתם תוכנה!<br>
+                • זמין לכל מקום בעולם - ללא מגבלות מקום<br>
+                • <strong>מתאים לבנים ובנות!</strong> - הסניף היחיד שלנו שמקבל בנות<br>
+                • מושלם למי שרוצה דיסקרטיות<br>
+                • גמישות מלאה בזמנים<br>
+                • ללא נסיעות או מגבלות תחבורה<br>
+                • תרגול חווייתי בהנחיית "יהודהלע" - הדמות המלווה שלנו<br>
+                • אותה איכות מקצועית כמו בסניפים הפיזיים!
+                </div>
+
+                הכי חשוב - זה מקצועי, בטוח, שקט ומכובד. בדיוק כמו בסניפים הפיזיים, אבל מהנוחות של הבית שלך! 🏠<br><br>
+
+                המחיר, השיטה, והתוצאות - הכל זהה לסניפים הפיזיים. גם כאן יש השתתפות קופות החולים.<br><br>
+
+                הסניף הזה מתאים במיוחד לתושבי פריפריה, לאנשים עסוקים, למשפחות עם בנות, ולמי שמעדיף פרטיות. זה נשמע רלוונטי בשבילך?`,
+                suggestions: ['איך מתחילים?', 'מה ההבדל מהסניפים הפיזיים?', 'זה מתאים למבוגרים?', 'איך קובעים?']
+            },
+
+            קשב: {
+                response: `קשב וריכוז - נושא שכל כך הרבה הורים שואלים עליו! 🧠 אני מבין בדיוק למה.<br><br>
+
+                <div class="highlight">
+                <strong>🔬 בדיקת MOXO - מה זה בעצם:</strong><br>
+                זו בדיקה מתקדמת שנותנת תוצאות מעמיקות על:<br>
+                • רמת הקשב והיכולת להתמקד<br>
+                • תזמון ומהירות תגובה<br>
+                • אימפולסיביות<br>
+                • היפראקטיביות<br><br>
+                
+                💰 עלות: רק 100 ₪ נוספים למבדק הרגיל
+                </div>
+
+                מה שחשוב להבין - לפעמים מה שנראה כמו "קושי בקריאה" הוא בעצם קושי בקשב. וברגע שאנחנו מזהים את זה נכון, אנחנו יכולים לטפל בזה בצורה הנכונה!<br><br>
+
+                הרב אפרים שבדרון, המנהל שלנו, נותן הרצאות מדהימות על הנושא הזה. הוא מביא הדמיות מוח חיות שמראות איך הילד חווה את הסביבה מבפנים. זה פשוט פותח עיניים! 👁️<br><br>
+
+                יש לך חשד לקושי קשב? או שאתה רק רוצה לוודא?`,
+                suggestions: ['איך עושים את הבדיקה?', 'זה כואב לילד?', 'מתי מומלץ לעשות?', 'ספר על ההרצאות']
+            },
+
+            מחירים: {
+                response: `בוא נדבר על המחירים בכנות ובשקיפות מלאה 💰<br><br>
+
+                <div class="highlight">
+                <strong>💵 מחירון מלא:</strong><br><br>
+                
+                <strong>🔍 המבדק המקיף 360°:</strong><br>
+                • מבדק בסיסי: 650 ₪ (כולל השתתפות כל קופות החולים!)<br>
+                • תוספת בדיקת MOXO: +100 ₪ בלבד<br><br>
+
+                <strong>📚 לימוד קריאה:</strong><br>
+                • בסניף או אונליין: אותו מחיר<br>
+                • כולל השתתפות קופות החולים<br>
+                • 45 דקות יומיות + 4 תוכנות תרגול<br><br>
+
+                <strong>🎤 הרצאות:</strong><br>
+                • מחיר משתנה לפי קבוצה וגודל אירוע
+                </div>
+
+                מה שחשוב לי שתדע - אנחנו עובדים עם כל קופות החולים, אז חלק מהעלות חוזר אליך! 🎯<br><br>
+
+                גם אם המצב הכלכלי קצת לוחץ, בוא נדבר. לפעמים אפשר למצוא פתרונות. הכי חשוב לנו זה שהילד יקבל את מה שהוא צריך! ❤️<br><br>
+
+                איזה שירות מעניין אותך הכי הרבה?`,
+                suggestions: ['ספר על השתתפות הקופות', 'יש הנחות למשפחות?', 'איך משלמים?', 'מה כלול במחיר?']
+            },
+
+            הרצאות: {
+                response: `ההרצאות של הרב אפרים שבדרון! 🎤 זה באמת משהו שכדאי לחוות.<br><br>
+
+                <div class="highlight">
+                <strong>🎯 למי זה מתאים:</strong><br>
+                • הורים שמתלבטים<br>
+                • מורים ומחנכים<br>
+                • צוותי חינוך<br>
+                • כל מי שרוצה להבין יותר על קשיי למידה<br><br>
+
+                <strong>💡 הנושאים שהוא מכסה:</strong><br>
+                • איך לזהות את מקור הקושי האמיתי<br>
+                • מתי הבעיה לא בקריאה אלא במקום אחר<br>
+                • איך להגיב נכון לילד מתקשה<br>
+                • הדרכה מעשית להורים<br>
+                • הדמיות מוח חיות שמראות איך הילד חווה את העולם
+                </div>
+
+                זה לא סתם הרצאה יבשה! הרב שבדרון מביא מאות מקרים אמיתיים, סיפורים מרגשים, וכלים פרקטיים שאפשר ליישם מיד.<br><br>
+
+                הדבר הכי חזק זה ההדמיות של המוח. לראות איך הילד שלך חווה את הכיתה מבפנים - זה פשוט משנה הכל! 🧠✨<br><br>
+
+                רוצה שאעזור לך להזמין הרצאה לקבוצה שלך?`,
+                suggestions: ['איך מזמינים הרצאה?', 'אפשר גם בזום?', 'מה העלות?', 'כמה זמן זה לוקח?']
+            },
+
+            תור: {
+                response: `בוא נקבע לך תור! 📅 אני שמח לעזור לך עם זה.<br><br>
+
+                כדי שנוכל לתת לך את השירות הכי טוב, אני צריך קצת פרטים בסיסיים. אל תדאג, זה מהיר וקל! 😊<br><br>
+
+                <div id="appointmentForm" class="form-container">
+                    <div class="form-field">
+                        <label>שם פרטי: *</label>
+                        <input type="text" id="firstName" required>
+                    </div>
+                    <div class="form-field">
+                        <label>שם משפחה: *</label>
+                        <input type="text" id="lastName" required>
+                    </div>
+                    <div class="form-field">
+                        <label>עיר מגורים: *</label>
+                        <input type="text" id="city" required>
+                    </div>
+                    <div class="form-field">
+                        <label>בן / בת: *</label>
+                        <select id="gender" required onchange="updateBranchOptions()">
+                            <option value="">בחר/י</option>
+                            <option value="בן">בן</option>
+                            <option value="בת">בת</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>גיל: *</label>
+                        <input type="number" id="age" required>
+                    </div>
+                    <div class="form-field">
+                        <label>מוסד לימודים:</label>
+                        <input type="text" id="school">
+                    </div>
+                    <div class="form-field">
+                        <label>שפת הקריאה: *</label>
+                        <select id="language" required>
+                            <option value="">בחר/י</option>
+                            <option value="לשון הקודש">לשון הקודש</option>
+                            <option value="עברית">עברית</option>
+                            <option value="חסידית">חסידית</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>מספר טלפון: *</label>
+                        <input type="tel" id="phone" required>
+                    </div>
+                    <div class="form-field">
+                        <label>סניף מועדף: *</label>
+                        <select id="branch" required>
+                            <option value="">בחר/י בן/בת קודם</option>
+                        </select>
+                    </div>
+                    <button class="submit-form-btn" onclick="submitAppointment()">שלח בקשה לקביעת תור</button>
+                </div>
+
+                אל תדאג, ברגע שתשלח את הפרטים, המומחים שלנו יחזרו אליך תוך 24 שעות לתיאום התור הכי נוח בשבילך! 🤝`,
+                suggestions: ['יש עוד שאלות על המבדק', 'מה קורה אחרי שאשלח?', 'כמה זמן לחכות לתור?', 'אפשר לבטל אם נצטרך?']
+            }
+        };
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            if (isUser) {
+                messageDiv.innerHTML = `
+                    <div class="message-content">${content}</div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="avatar">🤖</div>
+                    <div class="message-content">${content}</div>
+                `;
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            
+            // עבור הודעות הבוט - גלילה כך שהשורה הראשונה תהיה במרכז הדף
+            if (!isUser) {
+                setTimeout(() => {
+                    const containerHeight = chatMessages.clientHeight;
+                    const messageTop = messageDiv.offsetTop;
+                    // כוונון כך שהשורה הראשונה תהיה במיקום נוח - 30% מלמעלה
+                    const targetScroll = messageTop - (containerHeight * 0.3);
+                    
+                    chatMessages.scrollTo({
+                        top: Math.max(0, targetScroll),
+                        behavior: 'smooth'
+                    });
+                }, 100);
+            } else {
+                // עבור הודעות משתמש - גלילה רגילה לתחתית
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.innerHTML = `
+                <div class="avatar">🤖</div>
+                <div class="typing-indicator" style="display: block;">
+                    <div class="typing-dots">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            return typingDiv;
+        }
+
+        function generateContextualResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            // בדיקת מילות מפתח
+            if (lowerMessage.includes('בנות') || lowerMessage.includes('ילדות') || lowerMessage.includes('בת ') || lowerMessage.includes('ילדה')) {
+                return {
+                    response: `אני שמח שאת/ה פונה לגבי בנות! 👧💕<br><br>
+
+                    <div class="highlight">
+                    <strong>🌟 לימוד קריאה לבנות במכון מקראות:</strong><br><br>
+                    
+                    בנות יכולות ללמוד אצלנו <strong>בסניף האונליין בלבד</strong> - וזה בעצם יתרון מדהים!<br><br>
+                    
+                    💻 <strong>למה הסניף האונליין מושלם לבנות:</strong><br>
+                    • פרטיות מלאה ונוחות הבית<br>
+                    • לימוד אישי ממורים מקצועיים<br>
+                    • גמישות מלאה בזמנים<br>
+                    • אותה איכות ותוצאות כמו בסניפים הפיזיים<br>
+                    • תרגול חווייתי עם "יהודהלע" - הדמות המלווה<br>
+                    • השתתפות קופות החולים
+                    </div>
+
+                    הרבה הורים מגלים שהלימוד האונליין אפילו יותר מתאים לבנות - יש פחות הסחות דעת, יותר מיקוד, והן מרגישות בנוח בסביבה הביתית.<br><br>
+
+                    מגיל 5 ועד מבוגרות - כולן מוזמנות! יש לנו הצלחות מדהימות עם בנות. 🎉<br><br>
+
+                    רוצה לשמוע עוד פרטים על איך זה עובד?`,
+                    suggestions: ['איך מתחילים באונליין?', 'מה המחיר לבנות?', 'כמה זמן התהליך?', 'איך קובעים תור למבדק?']
+                };
+            }
+            if (lowerMessage.includes('סניף') || lowerMessage.includes('סניפים')) {
+                return responses.לימודים;
+            }
+            if (lowerMessage.includes('הרצאה') || lowerMessage.includes('הרצאות')) {
+                return responses.הרצאות;
+            }
+            if (lowerMessage.includes('מבדק') || lowerMessage.includes('בדיקה') || lowerMessage.includes('360')) {
+                return responses.מבדק;
+            }
+            if (lowerMessage.includes('לימוד') || lowerMessage.includes('ללמוד') || lowerMessage.includes('קריאה')) {
+                return responses.לימודים;
+            }
+            if (lowerMessage.includes('אונליין') || lowerMessage.includes('מהבית') || lowerMessage.includes('מרחוק')) {
+                return responses.אונליין;
+            }
+            if (lowerMessage.includes('קשב') || lowerMessage.includes('ריכוז') || lowerMessage.includes('מוקסו') || lowerMessage.includes('moxo')) {
+                return responses.קשב;
+            }
+            if (lowerMessage.includes('מחיר') || lowerMessage.includes('עולה') || lowerMessage.includes('כסף') || lowerMessage.includes('עלות')) {
+                return responses.מחירים;
+            }
+            if (lowerMessage.includes('תור') || lowerMessage.includes('לקבוע') || lowerMessage.includes('פגישה')) {
+                return responses.תור;
+            }
+            if (lowerMessage.includes('אחרי שאשלח') || lowerMessage.includes('מה קורה אחרי') || lowerMessage.includes('אחרי הטופס') || lowerMessage.includes('אחרי שמלאתי')) {
+                return {
+                    response: `תודה שאתה שואל! 😊 זה חשוב לדעת מה קורה הלאה.<br><br>
+
+                    <div class="highlight">
+                    <strong>🤝 מה קורה אחרי שתשלח את הטופס:</strong><br><br>
+                    
+                    המזכיר שלנו יצור איתך קשר תוך 24 שעות מקבלת הטופס.<br><br>
+                    
+                    💡 <strong>חשוב!</strong> אנא הקפד להיות זמין לטלפון - נרצה לתאם איתך את התור המתאים ביותר ולענות על כל שאלה שתהיה לך.
+                    </div>
+
+                    המזכיר יסביר לך בדיוק מה צריך להכין למבדק, איך זה עובד, ויענה על כל השאלות שלך. הוא גם יעזור לך למצוא את המועד הכי נוח עבורכם.<br><br>
+
+                    אם בינתיים יש עוד שאלות, אני כאן! 🤗`,
+                    suggestions: ['איך מתכוננים למבדק?', 'מה לקחת איתנו?', 'כמה זמן התור?', 'אפשר לשנות מועד?']
+                };
+            }
+
+            // תגובות אישיות לפי הקשר
+            const personalResponses = [
+                {
+                    keywords: ['ביישן', 'פחד', 'חרדה', 'לא רוצה'],
+                    response: `אני מבין בדיוק את החששות שלך 💙<br><br>ילדים ביישנים זה משהו שאנחנו מכירים טוב מאוד! המומחים שלנו יודעים בדיוק איך להתחבר לילד בעדינות ולגרום לו להרגיש בנוח.<br><br>במבדק, ההורים נמצאים איתו כל הזמן, וכל הבדיקות נעשות בצורה משחקית וחמה. אף פעם לא בלחץ! 🤗<br><br>רוצה שאספר לך בדיוק איך אנחנו עובדים עם ילדים רגישים?`,
+                    suggestions: ['ספר איך זה עובד בפועל', 'כמה זמן זה לוקח?', 'האם ההורים נמצאים?', 'מה אם הוא לא ישתף פעולה?']
+                },
+                {
+                    keywords: ['מבוגר', 'בן 20', 'בן 30', 'גדול', 'מבוגרת'],
+                    response: `כל הכבוד שאתה לוקח אחריות על השיפור שלך! 👏<br><br>מבוגרים זה בעצם הקטע הכי מתגמל בעבודה שלנו. יש משהו מיוחד לראות איך אדם משנה את החיים שלו בגיל מבוגר.<br><br>הלימודים שלנו מתאימים מגיל 5 ועד... אין גיל עליון! יש לנו הצלחות מדהימות עם מבוגרים שרצו לשפר את הקריאה שלהם, הן מבחינה מקצועית והן אישית.<br><br>הלימוד אונליין מושלם בשבילך - דיסקרטיות מלאה, גמישות בזמנים, וכל זה מהנוחות של הבית! 🏠✨<br><br>מה המניע שלך לשיפור?`,
+                    suggestions: ['ספר על הלימוד אונליין', 'כמה זמן זה לוקח?', 'זה עובד גם למבוגרים?', 'איך מתחילים?']
+                },
+                {
+                    keywords: ['כאב', 'כואב', 'פחד מכאב', 'זריקה'],
+                    response: `אל תדאג בכלל! 😊 המבדק שלנו הוא 100% לא פולשני ובטוח לחלוטין.<br><br>אין כאן שום זריקות, שום כאב, שום דבר לא נעים! זה בעיקר משחקים, תרגילים על המחשב, קריאה, וכתיבה פשוטה.<br><br>הדבר הכי "מפחיד" זה אולי להסתכל דרך משקפיים מיוחדים לבדיקת הראייה - וגם זה כיף לילדים! 🤓<br><br>אני מבטיח לך שיותר "מפחיד" לך מאשר לילד. הם בדרך כלל נהנים! 😄`,
+                    suggestions: ['איך מתכוננים למבדק?', 'מה בדיוק עושים שם?', 'כמה זמן זה לוקח?', 'ההורים נמצאים?']
+                }
+            ];
+
+            for (let resp of personalResponses) {
+                if (resp.keywords.some(keyword => lowerMessage.includes(keyword))) {
+                    return resp;
+                }
+            }
+
+            // תגובת ברירת מחדל אישית
+            return {
+                response: `תודה שפנית אלי! 😊 אני רוצה לתת לך תשובה הכי מדויקת שאפשר.<br><br>אני רואה שיש לך שאלה על "${message}" - ואני רוצה לעזור לך בדיוק עם מה שאתה צריך.<br><br>בינתיים, הנה כמה דברים שאולי יעניינו אותך:<br><br>🔍 <strong>המבדק המקיף שלנו</strong> - בודק הכל: ראייה, שמיעה, זיכרון, קריאה וקשב<br>📚 <strong>לימוד קריאה</strong> - בסניפים או אונליין עם 95% הצלחה<br>💰 <strong>מחירים שקופים</strong> - עם השתתפות קופות החולים<br><br>איך אני יכול לעזור לך הכי טוב?`,
+                suggestions: ['ספר על המבדק', 'מעניין אותי הלימוד', 'איך קובעים תור?', 'מה המחירים?']
+            };
+        }
+
+        function updateQuickReplies(suggestions) {
+            const quickButtons = document.querySelector('.quick-buttons');
+            quickButtons.innerHTML = '';
+            
+            suggestions.forEach(suggestion => {
+                const btn = document.createElement('button');
+                btn.className = 'quick-btn';
+                btn.textContent = suggestion;
+                btn.onclick = () => handleQuickReply(suggestion);
+                quickButtons.appendChild(btn);
+            });
+        }
+
+        function handleQuickReply(topic) {
+            addMessage(topic, true);
+            
+            const typingElement = showTyping();
+            
+            setTimeout(() => {
+                chatMessages.removeChild(typingElement);
+                
+                let responseData;
+                if (responses[topic]) {
+                    responseData = responses[topic];
+                } else {
+                    responseData = generateContextualResponse(topic);
+                }
+                
+                addMessage(responseData.response);
+                if (responseData.suggestions) {
+                    updateQuickReplies(responseData.suggestions);
+                }
+            }, 1500);
+        }
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+            
+            addMessage(message, true);
+            messageInput.value = '';
+            
+            const typingElement = showTyping();
+            
+            setTimeout(() => {
+                chatMessages.removeChild(typingElement);
+                
+                const responseData = generateContextualResponse(message);
+                addMessage(responseData.response);
+                
+                if (responseData.suggestions) {
+                    updateQuickReplies(responseData.suggestions);
+                }
+            }, 1500);
+        }
+
+        function updateBranchOptions() {
+            const gender = document.getElementById('gender').value;
+            const branchSelect = document.getElementById('branch');
+            
+            // נקה אפשרויות קיימות
+            branchSelect.innerHTML = '<option value="">בחר/י סניף</option>';
+            
+            if (gender === 'בן') {
+                branchSelect.innerHTML += `
+                    <option value="ביתר עילית">ביתר עילית</option>
+                    <option value="מודיעין עילית">מודיעין עילית</option>
+                    <option value="בית שמש">בית שמש</option>
+                    <option value="אונליין">הסניף האונליין</option>
+                `;
+            } else if (gender === 'בת') {
+                branchSelect.innerHTML += `
+                    <option value="אונליין">הסניף האונליין (היחיד הפתוח לבנות)</option>
+                `;
+            }
+        }
+
+        function submitAppointment() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const city = document.getElementById('city').value;
+            const gender = document.getElementById('gender').value;
+            const age = document.getElementById('age').value;
+            const phone = document.getElementById('phone').value;
+            const language = document.getElementById('language').value;
+            const branch = document.getElementById('branch').value;
+
+            if (!firstName || !lastName || !city || !gender || !age || !phone || !language || !branch) {
+                addMessage('אופס! 😅 נראה שחסרים כמה פרטים חובה. תוכל למלא את כל השדות עם הכוכבית (*) ולנסות שוב?');
+                return;
+            }
+
+            const formData = `שם: ${firstName} ${lastName}\nעיר: ${city}\nבן/בת: ${gender}\nגיל: ${age}\nטלפון: ${phone}\nשפה: ${language}\nסניף: ${branch}`;
+            
+            addMessage(`מושלם! 🎉 קיבלתי את הפרטים שלך:<br><br>${formData.replace(/\n/g, '<br>')}<br><br>המומחים שלנו יחזרו אליך תוך 24 שעות לתיאום התור המתאים ביותר!<br><br>בינתיים, אם יש עוד שאלות - אני כאן בשבילך! ❤️`);
+            
+            updateQuickReplies(['יש עוד שאלות על המבדק', 'ספר על התהליך', 'מה המחירים?', 'איך מתכוננים?']);
+        }
+
+        // Event listeners
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        // Auto-focus על תיבת הטקסט
+        messageInput.focus();
+    </script>
+</body>
+</html>
