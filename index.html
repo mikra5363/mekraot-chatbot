@@ -751,23 +751,43 @@
             // הודעה שמעדכנת שהטופס נשלח
             addMessage('⏳ שולח את הטופס לגוגל שיטס...', false, true);
             
-            // הכנת הנתונים לשליחה
-            const formDataToSend = new FormData();
-            Object.keys(formData).forEach(key => {
-                formDataToSend.append(key, formData[key]);
-            });
+            // הכנת URL עם הפרמטרים (כמו GET במקום POST)
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbwNzQQYnIdVqmDKbld49aJcrWCfKC_EGD96FOdDfrKouwgx1PmeKtXKUboaJd88sJaPuw/exec'; // החלף בכתובת שלך
             
-            // שליחה לגוגל שיטס דרך Google Apps Script
-            fetch('YOUR_GOOGLE_APPS_SCRIPT_URL', { // החלף בכתובת שתקבל מגוגל
+            const params = new URLSearchParams();
+            params.append('firstName', formData.firstName);
+            params.append('lastName', formData.lastName);
+            params.append('city', formData.city);
+            params.append('gender', formData.gender);
+            params.append('school', formData.school);
+            params.append('grade', formData.grade);
+            params.append('readingLevel', formData.readingLevel);
+            params.append('language', formData.language);
+            params.append('branch', formData.branch);
+            params.append('relation', formData.relation);
+            params.append('phone', formData.phone);
+            params.append('email', formData.email);
+            params.append('languageKindergarten', formData.languageKindergarten);
+            params.append('speechTherapy', formData.speechTherapy);
+            params.append('eyeExam', formData.eyeExam);
+            params.append('hearingTest', formData.hearingTest);
+            params.append('earFluid', formData.earFluid);
+            params.append('earSurgery', formData.earSurgery);
+            params.append('adhdTests', formData.adhdTests);
+            params.append('adhdDetails', formData.adhdDetails);
+            params.append('timestamp', formData.timestamp);
+            
+            // שליחה לגוגל שיטס
+            fetch(scriptURL, {
                 method: 'POST',
-                body: formDataToSend
+                body: params
             })
             .then(response => response.text())
             .then(result => {
                 console.log('✅ נתונים נשלחו בהצלחה לגוגל שיטס:', result);
                 
                 // הודעת הצלחה למשתמש
-                const confirmationMessage = `✅ <strong>טופס נשלח בהצלחה!</strong>
+                const confirmationMessage = `✅ <strong>טופס נשלח בהצלחה לגוגל שיטס!</strong>
 
 <strong>📋 סיכום הבקשה:</strong>
 • תלמיד: ${formData.firstName} ${formData.lastName}
@@ -776,7 +796,7 @@
 • זמן שליחה: ${formData.timestamp}
 
 <strong>📞 מה קורה עכשיו?</strong>
-• הפרטים נשמרו במערכת
+• הפרטים נשמרו בגוגל שיטס
 • נציג המכון יצור עמכם קשר תוך 24 שעות
 • נקבע ביחד זמן נוח למבדק
 • תקבלו אישור לפי מספר הטלפון שהשארתם
@@ -791,7 +811,7 @@
                 // הודעת שגיאה למשתמש
                 const errorMessage = `❌ <strong>שגיאה בשליחת הטופס</strong>
 
-מצטערים, הייתה תקלה בשליחת הטופס.
+מצטערים, הייתה תקלה בשליחת הטופס לגוגל שיטס.
 
 <strong>📞 אנא פנו אלינו ישירות:</strong>
 • טלפון: [המספר שלכם]
@@ -799,11 +819,9 @@
 
 נשמח לקבוע לכם תור טלפונית! 📱
 
-<strong>בינתיים, הנתונים נשמרו בזיכרון המקומי.</strong>`;
+<strong>הנתונים נשמרו בקונסול לגיבוי.</strong>`;
                 
                 addMessage(errorMessage, false, true);
-                
-                // שמירה בקונסול כגיבוי
                 console.log('📋 נתוני הטופס (גיבוי):', formData);
             });
         }
