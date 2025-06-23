@@ -61,7 +61,29 @@
         // בדיקה אם זה טלפון והצגת הפופאפ
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768) {
             
-                           
+            // הצגת הפופאפ
+            window.addEventListener('load', function() {
+                const popup = document.getElementById('fullscreenPopup');
+                const btn = document.getElementById('fullscreenBtn');
+                
+                // הצגת הפופאפ
+                popup.style.display = 'flex';
+                
+                // פונקציה להכנסה למסך מלא
+                function goFullscreen() {
+                    const elem = document.documentElement;
+                    if (elem.requestFullscreen) {
+                        elem.requestFullscreen();
+                    } else if (elem.webkitRequestFullscreen) {
+                        elem.webkitRequestFullscreen();
+                    } else if (elem.msRequestFullscreen) {
+                        elem.msRequestFullscreen();
+                    }
+                    
+                    // הסתרת הפופאפ אחרי הפעלה
+                    popup.style.display = 'none';
+                }
+                
                 // הפעלת מסך מלא בלחיצה על הכפתור
                 btn.addEventListener('click', goFullscreen);
                 btn.addEventListener('touchstart', goFullscreen);
@@ -265,6 +287,19 @@
                 border-radius: 0;
                 height: 100vh;
             }
+        }
+        
+        /* שדות ריקים - מסגרת אדומה */
+        .field-error {
+            border: 2px solid #e74c3c !important;
+            background-color: #fdf2f2 !important;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
         }
         .chat-header {
             background: linear-gradient(135deg, #2c5f5f 0%, #8b2635 100%);
@@ -1076,6 +1111,22 @@
             `;
             
             addMessage(formHTML, false, true);
+            
+            // הוספת מאזיני אירועים להסרת שגיאות כאשר המשתמש מתחיל להקליד
+            setTimeout(() => {
+                const requiredFields = ['firstName', 'lastName', 'city', 'gender', 'school', 'grade', 'readingLevel', 'language', 'branch', 'relation', 'phone'];
+                requiredFields.forEach(fieldId => {
+                    const element = document.getElementById(fieldId);
+                    if (element) {
+                        element.addEventListener('input', function() {
+                            this.classList.remove('field-error');
+                        });
+                        element.addEventListener('change', function() {
+                            this.classList.remove('field-error');
+                        });
+                    }
+                });
+            }, 100);
         }
 
         // פונקציה לשליחת הטופס
@@ -1083,12 +1134,32 @@
             // בדיקת תקינות השדות החובה
             const requiredFields = ['firstName', 'lastName', 'city', 'gender', 'school', 'grade', 'readingLevel', 'language', 'branch', 'relation', 'phone'];
             
+            let emptyFields = [];
+            let hasErrors = false;
+            
+            // ניקוי שגיאות קודמות
+            requiredFields.forEach(fieldId => {
+                const element = document.getElementById(fieldId);
+                if (element) {
+                    element.classList.remove('field-error');
+                }
+            });
+            
+            // בדיקת שדות ריקים וסימון באדום
             for (let field of requiredFields) {
                 const element = document.getElementById(field);
                 if (!element || !element.value.trim()) {
-                    alert('❌ אנא מלאו את כל השדות החובה (מסומנים ב-*)');
-                    return;
+                    if (element) {
+                        element.classList.add('field-error');
+                        emptyFields.push(getFieldName(field));
+                    }
+                    hasErrors = true;
                 }
+            }
+            
+            if (hasErrors) {
+                alert('❌ השדות הבאים חובה למילוי:\n• ' + emptyFields.join('\n• '));
+                return;
             }
             
             const formData = {
@@ -1118,12 +1189,40 @@
             sendFormToOwner(formData);
         }
 
+        // פונקציה לקבלת שם השדה בעברית
+        function getFieldName(fieldId) {
+            const fieldNames = {
+                'firstName': 'שם פרטי',
+                'lastName': 'שם משפחה',
+                'city': 'עיר מגורים',
+                'gender': 'בן/בת',
+                'school': 'מוסד לימודים',
+                'grade': 'כיתה',
+                'readingLevel': 'הברת הקריאה',
+                'language': 'סוג הקריאה',
+                'branch': 'סניף',
+                'relation': 'קירבה לתלמיד',
+                'phone': 'מספר טלפון'
+            };
+            return fieldNames[fieldId] || fieldId;
+        }
+
         // פונקציה לניקוי הטופס
         function resetSchedulingForm() {
             if (confirm('האם אתה בטוח שברצונך לנקות את הטופס?')) {
                 const form = document.getElementById('appointmentForm');
                 if (form) {
                     form.reset();
+                    
+                    // ניקוי סימון שגיאות אדומות
+                    const requiredFields = ['firstName', 'lastName', 'city', 'gender', 'school', 'grade', 'readingLevel', 'language', 'branch', 'relation', 'phone'];
+                    requiredFields.forEach(fieldId => {
+                        const element = document.getElementById(fieldId);
+                        if (element) {
+                            element.classList.remove('field-error');
+                        }
+                    });
+                    
                     alert('🔄 הטופס נוקה בהצלחה');
                 }
             }
