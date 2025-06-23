@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>מכון מקראות - בוט חכם</title>
     
-    <!-- מסך מלא קבוע לטלפונים -->
+    <!-- מסך מלא מיידי לטלפונים -->
     <script>
         // בדיקה אם זה טלפון
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768) {
@@ -22,23 +22,35 @@
                 }
             }
             
-            // כניסה למסך מלא מיד כשהדף נטען
-            document.addEventListener('DOMContentLoaded', goFullscreen);
+            // ניסיון מיידי - רגע אחרי שהדף מתחיל להיטען
+            setTimeout(goFullscreen, 10);
+            setTimeout(goFullscreen, 100);
+            setTimeout(goFullscreen, 500);
             
-            // כניסה למסך מלא בכל קליק
+            // כניסה למסך מלא בכל אירוע אפשרי
+            window.addEventListener('load', goFullscreen);
+            document.addEventListener('DOMContentLoaded', goFullscreen);
             document.addEventListener('click', goFullscreen);
             document.addEventListener('touchstart', goFullscreen);
+            document.addEventListener('touchend', goFullscreen);
+            document.addEventListener('keydown', goFullscreen);
+            document.addEventListener('scroll', goFullscreen);
+            document.addEventListener('resize', goFullscreen);
+            
+            // ניסיון עם focus
+            window.addEventListener('focus', goFullscreen);
+            window.addEventListener('blur', function() { setTimeout(goFullscreen, 50); });
             
             // מניעת יציאה ממסך מלא
             document.addEventListener('fullscreenchange', function() {
                 if (!document.fullscreenElement) {
-                    setTimeout(goFullscreen, 100);
+                    setTimeout(goFullscreen, 10);
                 }
             });
             
             document.addEventListener('webkitfullscreenchange', function() {
                 if (!document.webkitFullscreenElement) {
-                    setTimeout(goFullscreen, 100);
+                    setTimeout(goFullscreen, 10);
                 }
             });
             
@@ -46,9 +58,23 @@
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     e.preventDefault();
-                    goFullscreen();
+                    setTimeout(goFullscreen, 10);
                 }
             });
+            
+            // ניסיון אגרסיבי - כל 100ms בתחילה
+            var attempts = 0;
+            var fullscreenInterval = setInterval(function() {
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                    goFullscreen();
+                    attempts++;
+                    if (attempts > 50) { // אחרי 5 שניות מפסיק לנסות
+                        clearInterval(fullscreenInterval);
+                    }
+                } else {
+                    clearInterval(fullscreenInterval);
+                }
+            }, 100);
         }
     </script>
     <style>
