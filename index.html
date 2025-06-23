@@ -10,6 +10,43 @@
             padding: 0;
             box-sizing: border-box;
         }
+        
+        /* חיזוק CSS - עובד מיד בפתיחה הראשונה */
+        @media (max-width: 768px) {
+            html, body {
+                padding: 5px !important;
+            }
+            .chat-container {
+                height: 98vh !important;
+                border-radius: 10px !important;
+            }
+            .quick-question-btn {
+                padding: 6px 10px !important;
+                font-size: 11px !important;
+                margin: 2px !important;
+                min-height: 32px !important;
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            html, body {
+                padding: 2px !important;
+            }
+            .chat-container {
+                height: 99vh !important;
+                border-radius: 5px !important;
+            }
+            .quick-question-btn {
+                padding: 6px 8px !important;
+                font-size: 10px !important;
+                margin: 1px !important;
+                min-height: 30px !important;
+                border-radius: 12px !important;
+            }
+        }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #2c5f5f 0%, #8b2635 100%);
@@ -313,7 +350,22 @@
     </div>
 
     <script>
-        // זיהוי סוג המכשיר
+        // זיהוי מכשיר מיידי (לפני טעינת הדף)
+        (function() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768;
+            const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent) || (window.innerWidth > 768 && window.innerWidth <= 1024);
+            
+            // הוספת מחלקה מיידית לגוף הדף
+            if (isMobile) {
+                document.documentElement.classList.add('mobile-device');
+            } else if (isTablet) {
+                document.documentElement.classList.add('tablet-device');
+            } else {
+                document.documentElement.classList.add('desktop-device');
+            }
+        })();
+
+        // זיהוי סוג המכשיר (פונקציה משופרת)
         function detectDevice() {
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
             const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent);
@@ -326,21 +378,6 @@
                 screenWidth: screenWidth
             };
         }
-
-        // הפעלה בטעינת הדף
-        window.addEventListener('load', function() {
-            const device = detectDevice();
-            console.log('📱 זיהוי מכשיר:', device);
-            
-            // הוספת מחלקה לגוף הדף לפי סוג המכשיר
-            if (device.isMobile) {
-                document.body.classList.add('mobile-device');
-            } else if (device.isTablet) {
-                document.body.classList.add('tablet-device');
-            } else {
-                document.body.classList.add('desktop-device');
-            }
-        });
 
         // מאגר תשובות משופרות וחמות
         const responses = {
