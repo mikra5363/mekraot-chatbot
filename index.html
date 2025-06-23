@@ -2,8 +2,17 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>מכון מקראות - בוט חכם</title>
+    <script>
+    // ריענון אוטומטי מיידי לטלפונים
+    if (window.innerWidth <= 768 && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        if (!sessionStorage.getItem('refreshed')) {
+            sessionStorage.setItem('refreshed', '1');
+            location.reload();
+        }
+    }
+    </script>
     <style>
         * {
             margin: 0;
@@ -14,14 +23,18 @@
         /* חיזוק CSS - עובד מיד בפתיחה הראשונה */
         @media (max-width: 768px) {
             html, body {
-                padding: 0 !important;
+                height: 100vh !important;
+                overflow: hidden !important;
                 margin: 0 !important;
+                padding: 0 !important;
             }
             .chat-container {
-                height: 100vh !important;
+                height: 97vh !important;
+                max-height: 97vh !important;
                 border-radius: 0 !important;
                 border: none !important;
                 box-shadow: none !important;
+                overflow: hidden !important;
             }
             .quick-question-btn {
                 padding: 6px 10px !important;
@@ -36,7 +49,8 @@
         
         @media (max-width: 480px) {
             .chat-container {
-                height: 100vh !important;
+                height: 96vh !important;
+                max-height: 96vh !important;
                 border-radius: 0 !important;
             }
             .quick-question-btn {
@@ -73,25 +87,29 @@
         
         /* התאמות לטלפונים */
         @media (max-width: 768px) {
-            body {
-                align-items: flex-start;
+            html, body {
+                height: 100vh;
+                overflow: hidden;
+                margin: 0;
                 padding: 0;
             }
             .chat-container {
-                height: 100vh;
-                max-height: none;
+                height: 97vh;
+                max-height: 97vh;
                 border-radius: 0;
                 margin: 0;
                 border: none;
                 box-shadow: none;
+                overflow: hidden;
             }
         }
         
         /* התאמות לטלפונים קטנים */
         @media (max-width: 480px) {
             .chat-container {
+                height: 96vh;
+                max-height: 96vh;
                 border-radius: 0;
-                height: 100vh;
             }
         }
         .chat-header {
