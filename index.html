@@ -2,30 +2,27 @@
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>מכון מקראות - בוט חכם</title>
     
-    <!-- ריענון אוטומטי לטלפונים -->
+    <!-- מסך מלא לטלפונים -->
     <script>
-        // בדיקה מיידית אם זה טלפון וצריך ריענון
-        (function() {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const isSmallScreen = window.innerWidth <= 768;
-            
-            if (isMobile && isSmallScreen) {
-                const hasReloaded = sessionStorage.getItem('mobile_has_reloaded');
-                
-                if (!hasReloaded) {
-                    sessionStorage.setItem('mobile_has_reloaded', 'yes');
-                    console.log('🔄 ריענון אוטומטי לטלפון מתחיל...');
-                    setTimeout(function() {
-                        window.location.reload(true);
-                    }, 50);
-                } else {
-                    console.log('📱 טלפון - טעינה שנייה, הכל אמור להיות מושלם');
+        // מסך מלא מיידי לטלפונים
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768) {
+            // ניסיון להיכנס למסך מלא
+            document.addEventListener('DOMContentLoaded', function() {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen();
+                } else if (document.documentElement.webkitRequestFullscreen) {
+                    document.documentElement.webkitRequestFullscreen();
+                } else if (document.documentElement.mozRequestFullScreen) {
+                    document.documentElement.mozRequestFullScreen();
                 }
-            }
-        })();
+            });
+        }
     </script>
     <style>
         * {
