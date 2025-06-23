@@ -5,7 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>מכון מקראות - בוט חכם</title>
     
-    <!-- פופאפ מסך מלא לטלפונים -->
+    <!-- פופאפ מיידי לטלפונים - פשוט! -->
+    <script>
+        // אם זה טלפון - הצג פופאפ מיד
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768) {
+            // הצגת פופאפ מיד כשהסקריפט רץ
+            window.addEventListener('DOMContentLoaded', function() {
+                document.getElementById('fullscreenPopup').style.display = 'flex';
+            });
+        }
+    </script>
     <script>
         // בדיקה אם זה טלפון והצגת הפופאפ
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768) {
