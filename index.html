@@ -7,20 +7,54 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>מכון מקראות - בוט חכם</title>
     
-    <!-- פופאפ מיידי לטלפונים - בכוח! -->
+    <!-- מסך מלא עם הדמיית גלילה לטלפונים -->
     <script>
-        // זיהוי טלפון ופופאפ מיידי בכוח
-        if (window.innerWidth <= 768) {
-            // הפעלת פופאפ מיד - ללא חכמות
-            setTimeout(function() {
-                var popup = document.getElementById('fullscreenPopup');
-                if (popup) {
-                    popup.style.display = 'flex';
-                    console.log('📱 פופאפ הופעל בכוח!');
-                } else {
-                    console.log('❌ פופאפ לא נמצא');
+        // זיהוי טלפון והפעלת מסך מלא עם הדמיית גלילה
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            
+            // פונקציה להכנסה למסך מלא
+            function goFullscreen() {
+                var elem = document.documentElement;
+                if (elem.requestFullscreen) {
+                    elem.requestFullscreen();
+                } else if (elem.webkitRequestFullscreen) {
+                    elem.webkitRequestFullscreen();
+                } else if (elem.msRequestFullscreen) {
+                    elem.msRequestFullscreen();
                 }
-            }, 10);
+            }
+            
+            // הדמיית גלילה קטנה לאחר טעינת הדף
+            window.addEventListener('load', function() {
+                setTimeout(function() {
+                    // הדמיית גלילה קטנה למטה ולמעלה
+                    window.scrollBy(0, 10);
+                    setTimeout(function() {
+                        window.scrollBy(0, -10);
+                        // ניסיון להכנסה למסך מלא אחרי הגלילה
+                        goFullscreen();
+                    }, 50);
+                }, 100);
+            });
+            
+            // ניסיונות נוספים בכל אינטראקציה
+            document.addEventListener('click', goFullscreen);
+            document.addEventListener('touchstart', goFullscreen);
+            
+            // מניעת יציאה ממסך מלא
+            document.addEventListener('fullscreenchange', function() {
+                if (!document.fullscreenElement) {
+                    setTimeout(goFullscreen, 100);
+                }
+            });
+            
+            document.addEventListener('webkitfullscreenchange', function() {
+                if (!document.webkitFullscreenElement) {
+                    setTimeout(goFullscreen, 100);
+                }
+            });
+            
+            console.log('📱 מסך מלא עם הדמיית גלילה הופעל');
         }
     </script>
     <script>
