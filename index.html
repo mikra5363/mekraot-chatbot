@@ -14,11 +14,14 @@
         /* חיזוק CSS - עובד מיד בפתיחה הראשונה */
         @media (max-width: 768px) {
             html, body {
-                padding: 5px !important;
+                padding: 0 !important;
+                margin: 0 !important;
             }
             .chat-container {
-                height: 98vh !important;
-                border-radius: 10px !important;
+                height: 100vh !important;
+                border-radius: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
             }
             .quick-question-btn {
                 padding: 6px 10px !important;
@@ -32,12 +35,9 @@
         }
         
         @media (max-width: 480px) {
-            html, body {
-                padding: 2px !important;
-            }
             .chat-container {
-                height: 99vh !important;
-                border-radius: 5px !important;
+                height: 100vh !important;
+                border-radius: 0 !important;
             }
             .quick-question-btn {
                 padding: 6px 8px !important;
@@ -49,12 +49,13 @@
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #2c5f5f 0%, #8b2635 100%);
+            background: white;
+            margin: 0;
+            padding: 0;
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 10px;
         }
         .chat-container {
             max-width: 800px;
@@ -67,31 +68,30 @@
             flex-direction: column;
             height: 95vh;
             max-height: 900px;
+            border: 1px solid #e9ecef;
         }
         
         /* התאמות לטלפונים */
         @media (max-width: 768px) {
             body {
-                padding: 5px;
                 align-items: flex-start;
-                padding-top: 10px;
+                padding: 0;
             }
             .chat-container {
-                height: 98vh;
+                height: 100vh;
                 max-height: none;
-                border-radius: 10px;
+                border-radius: 0;
                 margin: 0;
+                border: none;
+                box-shadow: none;
             }
         }
         
         /* התאמות לטלפונים קטנים */
         @media (max-width: 480px) {
-            body {
-                padding: 2px;
-            }
             .chat-container {
-                border-radius: 5px;
-                height: 99vh;
+                border-radius: 0;
+                height: 100vh;
             }
         }
         .chat-header {
