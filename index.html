@@ -412,10 +412,39 @@
   text-align: center;
 }
 
-    </style>
+    
+    @media (max-width: 768px) {
+      #overlay {
+        position: fixed;
+        inset: 0;
+        background: #8b2635;
+        color: white;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        cursor: pointer;
+        text-align: center;
+      }
+    }
+
+    @media (min-width: 769px) {
+      #overlay {
+        display: none;
+      }
+    }
+
+</style>
 </head>
 <body>
-    
+  <div id="overlay">
+    לחץ על המסך כדי להפעיל את הבוט במסך מלא
+  </div>
+
+    <div id="overlay">
+  לחץ על המסך כדי להתחיל
+</div>
     <div class="chat-container">
         <div class="chat-header">
             <h1>🎓 מכון מקראות</h1>
@@ -1178,5 +1207,20 @@ document.getElementById('overlay').addEventListener('click', () => {
 });
 
     </script>
+
+  <script>
+    if (window.innerWidth <= 768) {
+      document.getElementById('overlay').addEventListener('click', () => {
+        const el = document.documentElement;
+        if (el.requestFullscreen) el.requestFullscreen();
+        else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+        else if (el.msRequestFullscreen) el.msRequestFullscreen();
+        document.getElementById('overlay').style.display = 'none';
+      });
+    } else {
+      document.getElementById('overlay').style.display = 'none';
+    }
+  </script>
+
 </body>
 </html>
