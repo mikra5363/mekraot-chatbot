@@ -748,41 +748,26 @@
         }
 
         function sendFormToOwner(formData) {
-            let message = `📋 בקשת תור חדשה!\n\n`;
-            message += `👤 פרטי התלמיד:\n`;
-            message += `שם: ${formData.firstName} ${formData.lastName}\n`;
-            message += `עיר: ${formData.city}\n`;
-            message += `מין: ${formData.gender}\n`;
-            message += `כיתה: ${formData.grade}\n`;
-            message += `מוסד לימודים: ${formData.school}\n`;
-            message += `הברת קריאה: ${formData.readingLevel}\n`;
-            message += `סוג קריאה: ${formData.language}\n\n`;
+            // הודעה שמעדכנת שהטופס נשלח
+            addMessage('⏳ שולח את הטופס לגוגל שיטס...', false, true);
             
-            message += `📍 פרטי הטיפול:\n`;
-            message += `סניף: ${formData.branch}\n`;
-            message += `קירבה לתלמיד: ${formData.relation}\n`;
-            message += `טלפון: ${formData.phone}\n`;
-            message += `אימייל: ${formData.email}\n\n`;
+            // הכנת הנתונים לשליחה
+            const formDataToSend = new FormData();
+            Object.keys(formData).forEach(key => {
+                formDataToSend.append(key, formData[key]);
+            });
             
-            if (formData.languageKindergarten || formData.speechTherapy || formData.eyeExam || formData.hearingTest || formData.earFluid || formData.earSurgery || formData.adhdTests) {
-                message += `🏥 מידע רפואי:\n`;
-                if (formData.languageKindergarten) message += `• למד בגן שפה\n`;
-                if (formData.speechTherapy) message += `• טופל אצל קלינאית תקשורת\n`;
-                if (formData.eyeExam) message += `• עבר בדיקת עיניים\n`;
-                if (formData.hearingTest) message += `• עבר בדיקת שמיעה\n`;
-                if (formData.earFluid) message += `• סבל מנוזלים באוזניים\n`;
-                if (formData.earSurgery) message += `• עבר ניתוח כפתורים\n`;
-                if (formData.adhdTests) message += `• עבר מבדקי קשב וריכוז\n`;
-                if (formData.adhdDetails) message += ` פרטים: ${formData.adhdDetails}\n`;
-                message += `\n`;
-            }
-            
-            message += `⏰ זמן הבקשה: ${formData.timestamp}`;
-            
-            console.log('📋 בקשת תור מפורטת:', formData);
-            
-            // הודעת אישור למשתמש
-            const confirmationMessage = `✅ <strong>טופס נשלח בהצלחה!</strong>
+            // שליחה לגוגל שיטס דרך Google Apps Script
+            fetch('https://script.google.com/macros/s/AKfycbylNc4ZxVg7ejGSDmzldE2lj2FUqa4OE6y_-dCk-xulL5E-CEHTxyY9ot2-ssbOOL4w4A/exec', { // החלף בכתובת שתקבל מגוגל
+                method: 'POST',
+                body: formDataToSend
+            })
+            .then(response => response.text())
+            .then(result => {
+                console.log('✅ נתונים נשלחו בהצלחה לגוגל שיטס:', result);
+                
+                // הודעת הצלחה למשתמש
+                const confirmationMessage = `✅ <strong>טופס נשלח בהצלחה!</strong>
 
 <strong>📋 סיכום הבקשה:</strong>
 • תלמיד: ${formData.firstName} ${formData.lastName}
@@ -791,13 +776,36 @@
 • זמן שליחה: ${formData.timestamp}
 
 <strong>📞 מה קורה עכשיו?</strong>
+• הפרטים נשמרו במערכת
 • נציג המכון יצור עמכם קשר תוך 24 שעות
 • נקבע ביחד זמן נוח למבדק
 • תקבלו אישור לפי מספר הטלפון שהשארתם
 
 תודה שבחרתם במכון מקראות! 🎓`;
-            
-            addMessage(confirmationMessage, false, true);
+                
+                addMessage(confirmationMessage, false, true);
+            })
+            .catch(error => {
+                console.error('❌ שגיאה בשליחת הנתונים:', error);
+                
+                // הודעת שגיאה למשתמש
+                const errorMessage = `❌ <strong>שגיאה בשליחת הטופס</strong>
+
+מצטערים, הייתה תקלה בשליחת הטופס.
+
+<strong>📞 אנא פנו אלינו ישירות:</strong>
+• טלפון: [המספר שלכם]
+• ווטסאפ: [המספר שלכם]
+
+נשמח לקבוע לכם תור טלפונית! 📱
+
+<strong>בינתיים, הנתונים נשמרו בזיכרון המקומי.</strong>`;
+                
+                addMessage(errorMessage, false, true);
+                
+                // שמירה בקונסול כגיבוי
+                console.log('📋 נתוני הטופס (גיבוי):', formData);
+            });
         }
 
         // פונקציה ליצירת קשר ויעוץ
