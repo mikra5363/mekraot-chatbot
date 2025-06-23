@@ -61,29 +61,7 @@
         // בדיקה אם זה טלפון והצגת הפופאפ
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768) {
             
-            // הצגת הפופאפ
-            window.addEventListener('load', function() {
-                const popup = document.getElementById('fullscreenPopup');
-                const btn = document.getElementById('fullscreenBtn');
-                
-                // הצגת הפופאפ
-                popup.style.display = 'flex';
-                
-                // פונקציה להכנסה למסך מלא
-                function goFullscreen() {
-                    const elem = document.documentElement;
-                    if (elem.requestFullscreen) {
-                        elem.requestFullscreen();
-                    } else if (elem.webkitRequestFullscreen) {
-                        elem.webkitRequestFullscreen();
-                    } else if (elem.msRequestFullscreen) {
-                        elem.msRequestFullscreen();
-                    }
-                    
-                    // הסתרת הפופאפ אחרי הפעלה
-                    popup.style.display = 'none';
-                }
-                
+                           
                 // הפעלת מסך מלא בלחיצה על הכפתור
                 btn.addEventListener('click', goFullscreen);
                 btn.addEventListener('touchstart', goFullscreen);
