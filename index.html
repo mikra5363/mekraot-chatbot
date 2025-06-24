@@ -1441,6 +1441,8 @@
             justify-content: center;
             align-items: center;
         }
+        
+        /* CSS בסיסי למחשב */
         .chat-container {
             max-width: 800px;
             width: 100%;
@@ -2142,6 +2144,10 @@
         function getResponse(question) {
             const q = question.toLowerCase();
             
+            // הוספת דיבוג
+            console.log('שאלה:', question);
+            console.log('שאלה באותיות קטנות:', q);
+            
             // AI מתקדם - ניתוח כוונה ותשובות מותאמות אישית
             
             // שאלות על חשיבות ו"למה"
@@ -2312,19 +2318,24 @@
             }
 
             // מילות מפתח ספציפיות קודם
-            if (q.includes('שטף קריאה') || q.includes('שטף') && q.includes('קריאה')) {
+            if (q.includes('שטף קריאה') || (q.includes('שטף') && q.includes('קריאה'))) {
+                console.log('זוהה: שטף קריאה');
                 return { text: responses.שטף_קריאה, showAI: true };
             }
             if (q.includes('פזילה')) {
+                console.log('זוהה: פזילה');
                 return { text: responses.פזילה, showAI: true };
             }
-            if (q.includes('מיקוד ראיה') || q.includes('מיקוד') && q.includes('ראיה')) {
+            if (q.includes('מיקוד ראיה') || (q.includes('מיקוד') && q.includes('ראיה'))) {
+                console.log('זוהה: מיקוד ראיה');
                 return { text: responses.מיקוד_ראיה, showAI: true };
             }
-            if (q.includes('קוצר ראיה') || q.includes('קוצר') && q.includes('ראיה')) {
+            if (q.includes('קוצר ראיה') || (q.includes('קוצר') && q.includes('ראיה'))) {
+                console.log('זוהה: קוצר ראיה');
                 return { text: responses.קוצר_ראיה, showAI: true };
             }
-            if (q.includes('רוחק ראיה') || q.includes('רוחק') && q.includes('ראיה')) {
+            if (q.includes('רוחק ראיה') || (q.includes('רוחק') && q.includes('ראיה'))) {
+                console.log('זוהה: רוחק ראיה');
                 return { text: responses.רוחק_ראיה, showAI: true };
             }
             if (q.includes('זכרון חזותי') || (q.includes('זכרון') && q.includes('חזותי'))) {
