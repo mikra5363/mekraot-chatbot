@@ -2311,6 +2311,63 @@
                 };
             }
 
+            // מילות מפתח ספציפיות קודם
+            if (q.includes('שטף קריאה') || q.includes('שטף') && q.includes('קריאה')) {
+                return { text: responses.שטף_קריאה, showAI: true };
+            }
+            if (q.includes('פזילה')) {
+                return { text: responses.פזילה, showAI: true };
+            }
+            if (q.includes('מיקוד ראיה') || q.includes('מיקוד') && q.includes('ראיה')) {
+                return { text: responses.מיקוד_ראיה, showAI: true };
+            }
+            if (q.includes('קוצר ראיה') || q.includes('קוצר') && q.includes('ראיה')) {
+                return { text: responses.קוצר_ראיה, showAI: true };
+            }
+            if (q.includes('רוחק ראיה') || q.includes('רוחק') && q.includes('ראיה')) {
+                return { text: responses.רוחק_ראיה, showAI: true };
+            }
+            if (q.includes('זכרון חזותי') || (q.includes('זכרון') && q.includes('חזותי'))) {
+                return { text: responses.זכרון_חזותי, showAI: true };
+            }
+            if (q.includes('זכרון שמיעתי') || (q.includes('זכרון') && q.includes('שמיעתי'))) {
+                return { text: responses.זכרון_שמיעתי, showAI: true };
+            }
+            if (q.includes('שיום') || q.includes('שליפה')) {
+                return { text: responses.שיום_ושליפה, showAI: true };
+            }
+            if (q.includes('בדיקת שמיעה') || (q.includes('שמיעה') && !q.includes('זכרון'))) {
+                return { text: responses.בדיקת_שמיעה, showAI: true };
+            }
+            if (q.includes('הבנת הנקרא') || q.includes('הבנה') && q.includes('נקרא')) {
+                return { text: responses.הבנת_הנקרא, showAI: true };
+            }
+            if (q.includes('דיסלקציה') || q.includes('דיסלקטי')) {
+                return { text: responses.דיסלקציה, showAI: true };
+            }
+            if (q.includes('לימודים במכון') || (q.includes('לימודים') && q.includes('מכון'))) {
+                return { text: responses.לימודים_במכון, showAI: true };
+            }
+            if (q.includes('הרצאות') || q.includes('הרצאה')) {
+                return { text: responses.הרצאות, showAI: true };
+            }
+            if (q.includes('גילאים') || q.includes('גיל') && q.includes('תלמידים')) {
+                return { text: responses.גילאי_תלמידים, showAI: true };
+            }
+            if (q.includes('סניפים') || q.includes('מקומות') && !q.includes('מחירים')) {
+                return { text: responses.סניפים, showAI: true };
+            }
+            if (q.includes('בנים') && !q.includes('בנות')) {
+                return { text: responses.בנים, showAI: true };
+            }
+            if (q.includes('בנות')) {
+                return { text: responses.בנות, showAI: true };
+            }
+            if (q.includes('חשיבות') || (q.includes('למה') && q.includes('מבדק'))) {
+                return { text: responses.חשיבות_המבדק, showAI: true };
+            }
+
+            // שאלות כלליות אחר כך
             if (q.includes('מבדק') || q.includes('אבחון') || q.includes('כולל')) {
                 return { text: responses.מבדק, showAI: true };
             }
@@ -2328,60 +2385,6 @@
             }
             if (q.includes('אונליין') || q.includes('מרחוק')) {
                 return { text: responses.אונליין, showAI: true };
-            }
-            if (q.includes('מיקוד ראיה') || q.includes('מיקוד') || (q.includes('ראיה') && q.includes('מיקוד'))) {
-                return { text: responses.מיקוד_ראיה, showAI: true };
-            }
-            if (q.includes('פזילה') || q.includes('עיניים') && q.includes('כיוון')) {
-                return { text: responses.פזילה, showAI: true };
-            }
-            if (q.includes('חשיבות') || (q.includes('למה') && q.includes('מבדק'))) {
-                return { text: responses.חשיבות_המבדק, showAI: true };
-            }
-            if (q.includes('זכרון חזותי') || q.includes('זכרון') && q.includes('חזותי')) {
-                return { text: responses.זכרון_חזותי, showAI: true };
-            }
-            if (q.includes('זכרון שמיעתי') || q.includes('זכרון') && q.includes('שמיעתי')) {
-                return { text: responses.זכרון_שמיעתי, showAI: true };
-            }
-            if (q.includes('דיסלקציה') || q.includes('דיסלקטי')) {
-                return { text: responses.דיסלקציה, showAI: true };
-            }
-            if (q.includes('שיום') || q.includes('שליפה') || (q.includes('שיום') && q.includes('שליפה'))) {
-                return { text: responses.שיום_ושליפה, showAI: true };
-            }
-            if (q.includes('בדיקת שמיעה') || q.includes('שמיעה') || q.includes('אוזניים')) {
-                return { text: responses.בדיקת_שמיעה, showAI: true };
-            }
-            if (q.includes('קוצר ראיה') || q.includes('קוצר') || (q.includes('ראיה') && q.includes('קוצר'))) {
-                return { text: responses.קוצר_ראיה, showAI: true };
-            }
-            if (q.includes('רוחק ראיה') || q.includes('רוחק') || (q.includes('ראיה') && q.includes('רוחק'))) {
-                return { text: responses.רוחק_ראיה, showAI: true };
-            }
-            if (q.includes('הבנת הנקרא') || q.includes('הבנה') || q.includes('הנקרא')) {
-                return { text: responses.הבנת_הנקרא, showAI: true };
-            }
-            if (q.includes('שטף קריאה') || q.includes('שטף') || (q.includes('קריאה') && q.includes('שטף'))) {
-                return { text: responses.שטף_קריאה, showAI: true };
-            }
-            if (q.includes('לימודים במכון') || (q.includes('לימודים') && q.includes('במכון'))) {
-                return { text: responses.לימודים_במכון, showAI: true };
-            }
-            if (q.includes('הרצאות') || q.includes('הרצאה')) {
-                return { text: responses.הרצאות, showAI: true };
-            }
-            if (q.includes('גילאים') || q.includes('גיל') || q.includes('תלמידים')) {
-                return { text: responses.גילאי_תלמידים, showAI: true };
-            }
-            if (q.includes('סניפים') || q.includes('מקומות') || q.includes('איפה')) {
-                return { text: responses.סניפים, showAI: true };
-            }
-            if (q.includes('בנים') || (q.includes('לבנים') && !q.includes('בנות'))) {
-                return { text: responses.בנים, showAI: true };
-            }
-            if (q.includes('בנות') || q.includes('לבנות')) {
-                return { text: responses.בנות, showAI: true };
             }
             if (q.includes('תוצאות') || q.includes('הצלחה') || q.includes('יעיל')) {
                 return {
