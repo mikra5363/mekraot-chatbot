@@ -396,10 +396,16 @@
                 min-width: 60px;
             }
         }
+        /* אפקט חלף לבועות */
         .quick-questions {
             padding: 12px 15px;
             background: #f8f9fa;
             border-top: 1px solid #eee;
+            transition: opacity 0.5s ease-in-out;
+        }
+        
+        .quick-questions.fading {
+            opacity: 0.3;
         }
         .quick-question-btn {
             display: inline-block;
@@ -478,7 +484,7 @@
         </div>
 
         <div class="quick-questions">
-            <h4>שאלות מומלצות: <span style="font-size: 10px; font-weight: normal; color: #666; cursor: pointer;" onclick="generateRandomBubbles()" title="רענן שאלות">🔄</span></h4>
+            <h4>שאלות מומלצות:</h4>
             <!-- הבועות יתווספו כאן באופן דינמי -->
         </div>
 
@@ -551,35 +557,43 @@
         function generateRandomBubbles() {
             const container = document.querySelector('.quick-questions');
             
-            // שמירת הכותרת
-            const title = container.querySelector('h4');
+            // אפקט fade out
+            container.classList.add('fading');
             
-            // ניקוי תוכן קיים (מלבד הכותרת)
-            while (container.children.length > 1) {
-                container.removeChild(container.lastChild);
-            }
-            
-            // בחירת 4 בועות באופן רנדומלי
-            const shuffled = [...questionBubbles].sort(() => 0.5 - Math.random());
-            const selectedBubbles = shuffled.slice(0, 4);
-            
-            // הוספת 4 בועות רנדומליות
-            selectedBubbles.forEach(bubble => {
-                const span = document.createElement('span');
-                span.className = 'quick-question-btn';
-                span.textContent = bubble.text;
-                span.onclick = () => handleBubbleClick(bubble.key);
-                container.appendChild(span);
-            });
-            
-            // הוספת בועה קבועה לקביעת תור
-            const appointmentSpan = document.createElement('span');
-            appointmentSpan.className = 'quick-question-btn';
-            appointmentSpan.style.background = '#8b2635';
-            appointmentSpan.style.color = 'white';
-            appointmentSpan.textContent = '📅 קביעת תור';
-            appointmentSpan.onclick = () => openSchedulingBot();
-            container.appendChild(appointmentSpan);
+            setTimeout(() => {
+                // שמירת הכותרת
+                const title = container.querySelector('h4');
+                
+                // ניקוי תוכן קיים (מלבד הכותרת)
+                while (container.children.length > 1) {
+                    container.removeChild(container.lastChild);
+                }
+                
+                // בחירת 4 בועות באופן רנדומלי
+                const shuffled = [...questionBubbles].sort(() => 0.5 - Math.random());
+                const selectedBubbles = shuffled.slice(0, 4);
+                
+                // הוספת 4 בועות רנדומליות
+                selectedBubbles.forEach(bubble => {
+                    const span = document.createElement('span');
+                    span.className = 'quick-question-btn';
+                    span.textContent = bubble.text;
+                    span.onclick = () => handleBubbleClick(bubble.key);
+                    container.appendChild(span);
+                });
+                
+                // הוספת בועה קבועה לקביעת תור
+                const appointmentSpan = document.createElement('span');
+                appointmentSpan.className = 'quick-question-btn';
+                appointmentSpan.style.background = '#8b2635';
+                appointmentSpan.style.color = 'white';
+                appointmentSpan.textContent = '📅 קביעת תור';
+                appointmentSpan.onclick = () => openSchedulingBot();
+                container.appendChild(appointmentSpan);
+                
+                // אפקט fade in
+                container.classList.remove('fading');
+            }, 250); // רבע שניה של fade out לפני החלפה
         }
 
         // פונקציה לטיפול בלחיצה על בועה
@@ -1606,6 +1620,11 @@
         
         // יצירת בועות רנדומליות בטעינת הדף
         generateRandomBubbles();
+        
+        // החלפת בועות אוטומטית כל 2 דקות
+        setInterval(() => {
+            generateRandomBubbles();
+        }, 120000); // 2 דקות = 120,000 מילישניות
     </script>
 </body>
 </html>
