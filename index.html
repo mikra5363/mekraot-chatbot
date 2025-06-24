@@ -280,6 +280,65 @@
             display: inline-block;
             font-weight: bold;
         }
+        
+        /* אפקט טיפוס - 3 כדורים קופצים */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            direction: ltr;
+        }
+        
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background: #8b2635;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: typing 1.8s infinite ease-in-out;
+        }
+        
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-15px);
+                opacity: 1;
+            }
+        }
+        
+        /* התאמה לטלפונים */
+        @media (max-width: 768px) {
+            .typing-indicator {
+                padding: 12px;
+            }
+            .typing-indicator span {
+                height: 6px;
+                width: 6px;
+            }
+            @keyframes typing {
+                0%, 60%, 100% {
+                    transform: translateY(0);
+                    opacity: 0.5;
+                }
+                30% {
+                    transform: translateY(-10px);
+                    opacity: 1;
+                }
+            }
+        }
         .input-container {
             padding: 15px;
             background: white;
@@ -760,10 +819,52 @@
             addMessage(message, true);
             input.value = '';
 
+            // הצגת אפקט טיפוס (3 כדורים קופצים)
+            const typingId = showTypingIndicator();
+
             setTimeout(() => {
+                // הסרת אפקט הטיפוס
+                removeTypingIndicator(typingId);
+                
+                // הצגת התשובה האמיתית
                 const result = getResponse(message);
                 addMessage(result.text, false, result.showAI);
-            }, 1000);
+            }, 2000); // 2 שניות של "חשיבה"
+        }
+
+        // פונקציה להצגת אפקט טיפוס
+        function showTypingIndicator() {
+            const container = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            const uniqueId = 'typing-' + Date.now();
+            messageDiv.id = uniqueId;
+            messageDiv.className = 'message bot-message';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'typing-indicator';
+            typingDiv.innerHTML = '<span></span><span></span><span></span>';
+            
+            bubble.appendChild(typingDiv);
+            messageDiv.appendChild(bubble);
+            container.appendChild(messageDiv);
+            
+            // גלילה למטה
+            setTimeout(() => {
+                container.scrollTop = container.scrollHeight;
+            }, 50);
+            
+            return uniqueId;
+        }
+
+        // פונקציה להסרת אפקט טיפוס
+        function removeTypingIndicator(typingId) {
+            const typingElement = document.getElementById(typingId);
+            if (typingElement) {
+                typingElement.remove();
+            }
         }
 
         // פונקציה להוספת הודעה עם גלילה יציבה ומחוזקת
