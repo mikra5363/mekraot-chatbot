@@ -9,12 +9,12 @@
     
     <!-- מסך מלא עם הדמיית גלילה לטלפונים -->
     <script>
-        // זיהוי טלפון והפעלת מסך מלא עם הדמיית גלילה
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        // זיהוי טלפון והפעלת מסך מלא אוטומטית עם הדמיית גלילה
+        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768) {
             
             // פונקציה להכנסה למסך מלא
             function goFullscreen() {
-                var elem = document.documentElement;
+                const elem = document.documentElement;
                 if (elem.requestFullscreen) {
                     elem.requestFullscreen();
                 } else if (elem.webkitRequestFullscreen) {
@@ -28,18 +28,19 @@
             window.addEventListener('load', function() {
                 setTimeout(function() {
                     // הדמיית גלילה קטנה למטה ולמעלה
-                    window.scrollBy(0, 10);
+                    window.scrollBy(0, 5);
                     setTimeout(function() {
-                        window.scrollBy(0, -10);
+                        window.scrollBy(0, -5);
                         // ניסיון להכנסה למסך מלא אחרי הגלילה
-                        goFullscreen();
+                        setTimeout(goFullscreen, 50);
                     }, 50);
-                }, 100);
+                }, 200);
             });
             
             // ניסיונות נוספים בכל אינטראקציה
             document.addEventListener('click', goFullscreen);
             document.addEventListener('touchstart', goFullscreen);
+            document.addEventListener('touchend', goFullscreen);
             
             // מניעת יציאה ממסך מלא
             document.addEventListener('fullscreenchange', function() {
@@ -54,61 +55,15 @@
                 }
             });
             
-            console.log('📱 מסך מלא עם הדמיית גלילה הופעל');
-        }
-    </script>
-    <script>
-        // בדיקה אם זה טלפון והצגת הפופאפ
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768) {
-            
-            // הצגת הפופאפ
-            window.addEventListener('load', function() {
-                const popup = document.getElementById('fullscreenPopup');
-                const btn = document.getElementById('fullscreenBtn');
-                
-                // הצגת הפופאפ
-                popup.style.display = 'flex';
-                
-                // פונקציה להכנסה למסך מלא
-                function goFullscreen() {
-                    const elem = document.documentElement;
-                    if (elem.requestFullscreen) {
-                        elem.requestFullscreen();
-                    } else if (elem.webkitRequestFullscreen) {
-                        elem.webkitRequestFullscreen();
-                    } else if (elem.msRequestFullscreen) {
-                        elem.msRequestFullscreen();
-                    }
-                    
-                    // הסתרת הפופאפ אחרי הפעלה
-                    popup.style.display = 'none';
+            // מניעת מקש ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    e.preventDefault();
+                    goFullscreen();
                 }
-                
-                // הפעלת מסך מלא בלחיצה על הכפתור
-                btn.addEventListener('click', goFullscreen);
-                btn.addEventListener('touchstart', goFullscreen);
-                
-                // מניעת יציאה ממסך מלא אחרי הפעלה
-                document.addEventListener('fullscreenchange', function() {
-                    if (!document.fullscreenElement) {
-                        setTimeout(goFullscreen, 100);
-                    }
-                });
-                
-                document.addEventListener('webkitfullscreenchange', function() {
-                    if (!document.webkitFullscreenElement) {
-                        setTimeout(goFullscreen, 100);
-                    }
-                });
-                
-                // מניעת מקש ESC
-                document.addEventListener('keydown', function(e) {
-                    if (e.key === 'Escape') {
-                        e.preventDefault();
-                        goFullscreen();
-                    }
-                });
             });
+            
+            console.log('📱 מסך מלא עם הדמיית גלילה הופעל');
         }
     </script>
     <style>
@@ -118,84 +73,6 @@
             box-sizing: border-box;
         }
         
-        /* פופאפ מסך מלא לטלפונים */
-        .fullscreen-popup {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: rgba(44, 95, 95, 0.95);
-            z-index: 10000;
-            justify-content: center;
-            align-items: center;
-            backdrop-filter: blur(5px);
-        }
-        
-        .fullscreen-button {
-            background: linear-gradient(135deg, #8b2635 0%, #2c5f5f 100%);
-            color: white;
-            border: none;
-            padding: 30px 50px;
-            border-radius: 25px;
-            font-size: 24px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
-            transform: scale(1);
-            transition: all 0.3s ease;
-            animation: pulseGlow 2s infinite;
-            text-align: center;
-            font-family: inherit;
-        }
-        
-        .fullscreen-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
-        
-        .fullscreen-button:active {
-            transform: scale(0.95);
-        }
-        
-        @keyframes pulseGlow {
-            0% {
-                box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 0 0 rgba(139, 38, 53, 0.7);
-            }
-            50% {
-                box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 0 20px rgba(139, 38, 53, 0);
-            }
-            100% {
-                box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 0 0 rgba(139, 38, 53, 0);
-            }
-        }
-        
-        .fullscreen-icon {
-            font-size: 30px;
-            margin-bottom: 10px;
-            display: block;
-            animation: bounce 1.5s infinite;
-        }
-        
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {
-                transform: translateY(0);
-            }
-            40% {
-                transform: translateY(-10px);
-            }
-            60% {
-                transform: translateY(-5px);
-            }
-        }
-        
-        /* הסתרת הפופאפ במחשבים */
-        @media (min-width: 769px) {
-            .fullscreen-popup {
-                display: none !important;
-            }
-        }
         @media (max-width: 768px) {
             html, body {
                 padding: 0 !important;
@@ -526,14 +403,6 @@
 </head>
 <body>
     <div class="chat-container">
-        <!-- פופאפ מסך מלא לטלפונים -->
-        <div id="fullscreenPopup" class="fullscreen-popup">
-            <button id="fullscreenBtn" class="fullscreen-button">
-                <span class="fullscreen-icon">📱</span>
-                להפעלה מלאה<br>לחץ כאן
-            </button>
-        </div>
-        
         <div class="chat-header">
             <h1>🎓 מכון מקראות</h1>
             <p>בוט חכם לייעוץ ומידע</p>
