@@ -9,62 +9,7 @@
     
     <!-- מסך מלא עם הדמיית גלילה לטלפונים -->
     <script>
-        // זיהוי טלפון והפעלת מסך מלא אוטומטית עם הדמיית גלילה
-        if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768) {
-            
-            // פונקציה להכנסה למסך מלא
-            function goFullscreen() {
-                const elem = document.documentElement;
-                if (elem.requestFullscreen) {
-                    elem.requestFullscreen();
-                } else if (elem.webkitRequestFullscreen) {
-                    elem.webkitRequestFullscreen();
-                } else if (elem.msRequestFullscreen) {
-                    elem.msRequestFullscreen();
-                }
-            }
-            
-            // הדמיית גלילה קטנה לאחר טעינת הדף
-            window.addEventListener('load', function() {
-                setTimeout(function() {
-                    // הדמיית גלילה קטנה למטה ולמעלה
-                    window.scrollBy(0, 5);
-                    setTimeout(function() {
-                        window.scrollBy(0, -5);
-                        // ניסיון להכנסה למסך מלא אחרי הגלילה
-                        setTimeout(goFullscreen, 50);
-                    }, 50);
-                }, 200);
-            });
-            
-            // ניסיונות נוספים בכל אינטראקציה
-            document.addEventListener('click', goFullscreen);
-            document.addEventListener('touchstart', goFullscreen);
-            document.addEventListener('touchend', goFullscreen);
-            
-            // מניעת יציאה ממסך מלא
-            document.addEventListener('fullscreenchange', function() {
-                if (!document.fullscreenElement) {
-                    setTimeout(goFullscreen, 100);
-                }
-            });
-            
-            document.addEventListener('webkitfullscreenchange', function() {
-                if (!document.webkitFullscreenElement) {
-                    setTimeout(goFullscreen, 100);
-                }
-            });
-            
-            // מניעת מקש ESC
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    e.preventDefault();
-                    goFullscreen();
-                }
-            });
-            
-            console.log('📱 מסך מלא עם הדמיית גלילה הופעל');
-        }
+        
     </script>
     <style>
         * {
@@ -525,9 +470,9 @@
 
 /* הצגה רק בטלפונים */
 @media (max-width: 768px) {
-    body.mobile-device .activate-bot-button {
-        display: flex !important;
-    }
+    html.mobile-device .activate-bot-button {
+    display: flex !important;
+}
 }
     </style>
 </head>
