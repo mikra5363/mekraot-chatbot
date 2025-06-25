@@ -464,10 +464,79 @@
                 justify-content: center;
             }
         }
+        /* לחצן הפעלת הבוט - עדין ויפה */
+.activate-bot-button {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 60px;
+    background: linear-gradient(135deg, #8b2635 0%, #2c5f5f 100%);
+    border: none;
+    border-radius: 30px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(139, 38, 53, 0.2);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-family: inherit;
+}
+
+/* אפקט גל עדין */
+.activate-bot-button::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    background: linear-gradient(135deg, #8b2635 0%, #2c5f5f 100%);
+    border-radius: 35px;
+    z-index: -1;
+    opacity: 0;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 0;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.3;
+        transform: scale(1.1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1.2);
+    }
+}
+
+.activate-bot-button:hover {
+    transform: translate(-50%, -50%) scale(1.05);
+    box-shadow: 0 12px 35px rgba(139, 38, 53, 0.3);
+}
+
+/* הצגה רק בטלפונים */
+@media (max-width: 768px) {
+    body.mobile-device .activate-bot-button {
+        display: flex !important;
+    }
+}
     </style>
 </head>
 <body>
-    <div class="chat-container">
+    <div class="chat-container" id="chatContainer">
+    <!-- לחצן הפעלת הבוט לטלפונים -->
+    <button class="activate-bot-button" id="activateBotButton" onclick="activateBot()">
+        🚀 לחץ להפעלה
+    </button>
         <div class="chat-header">
             <h1>🎓מִקְרָא-בּוֹט</h1>
             <p>בוט חכם של מִקְרָאוֹת לייעוץ ומידע</p>
