@@ -11,6 +11,7 @@
     <script>
         // זיהוי טלפון והפעלת מסך מלא אוטומטית עם הדמיית גלילה
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768) {
+
             
             // פונקציה להכנסה למסך מלא
             function goFullscreen() {
@@ -424,6 +425,55 @@
             color: white;
             transform: translateY(-1px);
         }
+        /* לחצן הפעלת הבוט לטלפונים */
+.activate-bot-button {
+    display: none; /* מוסתר כברירת מחדל */
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, #8b2635 0%, #a12e42 100%);
+    border: none;
+    border-radius: 50%;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(139, 38, 53, 0.3);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.2;
+}
+
+.activate-bot-button:hover {
+    transform: translate(-50%, -50%) scale(1.1);
+    box-shadow: 0 12px 35px rgba(139, 38, 53, 0.4);
+}
+
+.activate-bot-button:active {
+    transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* הצגת הלחצן רק בטלפונים */
+@media (max-width: 768px) {
+    .activate-bot-button {
+        display: flex !important;
+    }
+}
+
+/* חסימת טופס עד הפעלת הבוט */
+.chat-disabled .input-container,
+.chat-disabled .quick-questions {
+    pointer-events: none;
+    opacity: 0.7;
+}
         
         /* התאמות שאלות מהירות לטלפונים */
         @media (max-width: 768px) {
@@ -467,8 +517,12 @@
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
+<div class="chat-container" id="chatContainer">
+    <!-- לחצן הפעלת הבוט לטלפונים -->
+    <button class="activate-bot-button" id="activateBotButton" onclick="activateBot()">
+        🎓<br>הפעל את<br>הבוט
+    </button>
+            <div class="chat-header">
             <h1>🎓מִקְרָא-בּוֹט</h1>
             <p>בוט חכם של מִקְרָאוֹת לייעוץ ומידע</p>
         </div>
@@ -500,15 +554,22 @@
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && window.innerWidth <= 768;
             const isTablet = /iPad|Android(?!.*Mobile)/i.test(navigator.userAgent) || (window.innerWidth > 768 && window.innerWidth <= 1024);
             
-            // הוספת מחלקה מיידית לגוף הדף
-            if (isMobile) {
-                document.documentElement.classList.add('mobile-device');
-            } else if (isTablet) {
-                document.documentElement.classList.add('tablet-device');
-            } else {
-                document.documentElement.classList.add('desktop-device');
-            }
-        })();
+         // הוספת מחלקה מיידית לגוף הדף
+if (isMobile) {
+    document.documentElement.classList.add('mobile-device');
+    // הוספת מחלקת חסימה למכשירי נייד
+    document.addEventListener('DOMContentLoaded', function() {
+        const chatContainer = document.getElementById('chatContainer');
+        if (chatContainer) {
+            chatContainer.classList.add('chat-disabled');
+        }
+    });
+} else if (isTablet) {
+    document.documentElement.classList.add('tablet-device');
+} else {
+    document.documentElement.classList.add('desktop-device');
+}
+})();
 
         // זיהוי סוג המכשיר (פונקציה משופרת)
         function detectDevice() {
@@ -634,8 +695,6 @@
                 'זכרון_שמיעתי': responses.זכרון_שמיעתי,
                 'עיוורון_צבעים': responses.עיוורון_צבעים,
                 'טווח_גילאים': responses.טווח_גילאים,
-                'הרצאות': responses.הרצאות,
-                'לימודי_קריאה': responses.לימודי_קריאה,
                 
                 'מוקסו': `⚡ <strong>מבדק מוקסו (MOKXO) - הבדיקה המתקדמת לקשב וריכוז</strong>
 
@@ -704,36 +763,34 @@
 <strong>📊 התוצאות שלנו:</strong>
 מעל 95% מהילדים שמגיעים אלינו עם חשד לדיסלקציה - לומדים לקרוא!`,
 
-                'סניפים': `🏢 <strong>הסניפים של מכון מקראות - צוות מקצועי ברמה גבוהה בכל המקומות</strong>
+                'סניפים': `🏢 <strong>הסניפים של מכון מקראות - בחרו מה הכי נוח לכם</strong>
 
 <strong>📍 איפה אנחנו נמצאים?</strong>
 
-<strong>🏛️ ביתר עילית - צוות מקצועי מצוין</strong>
-• צוות מלמדים מקצועי
-• מפקחי קריאה ומורים מצויינים
+<strong>🏛️ ביתר עילית - המכון המרכזי</strong>
+• הסניף הראשי והמרכזי שלנו
+• הצוות הכי מנוסה והמקצועי
 • כל סוגי המבדקים והטיפולים
 • חניה נוחה ונגישות מלאה
 
-<strong>🌟 בית שמש - צוות מקצועי מצוין</strong>
-• צוות מלמדים מקצועי
-• מפקחי קריאה ומורים מצויינים
-• אותה רמה מקצועית גבוהה
+<strong>🌟 בית שמש - סניף מקצועי</strong>
+• סניף מודרני ומקצועי
 • מותאם לתושבי בית שמש והסביבה
+• אותה רמה מקצועית כמו הסניף המרכזי
 
-<strong>🏔️ קרית ספר (מודיעין עילית) - צוות מקצועי מצוין</strong>
-• צוות מלמדים מקצועי
-• מפקחי קריאה ומורים מצויינים
+<strong>🏔️ מודיעין עילית - לתושבי האזור</strong>
+• נוח לתושבי מודיעין עילית והסביבה
 • שירות מקצועי ואישי
 • כל סוגי המבדקים זמינים
 
 <strong>💻 אונליין - מכל מקום בעולם!</strong>
 • ללא הגבלה גיאוגרפית
-• אותה איכות כמו בסניפים הפיזיים
+• אותה איכות כמו במכון
 • מתאים במיוחד למבוגרים ולמקומות רחוקים
 • הצלחה של מעל 95%!
 
 <strong>🎯 איך לבחור?</strong>
-בחרו לפי הנוחות שלכם - כל הסניפים באותה רמה מקצועית גבוהה עם צוות מלמדים מקצועי, מפקחי קריאה ומורים מצויינים!`,
+בחרו לפי הנוחות שלכם - כל הסניפים באותה רמה מקצועית גבוהה!`,
 
                 'חשיבות_מבדק': `🔍 <strong>למה כל כך חשוב לעשות מבדק לפני תחילת הטיפול?</strong>
 
@@ -778,9 +835,9 @@
 זה בדיוק סוג הנושאים שאנחנו מטפלים בו במכון מקראות. כל נושא קשור לקריאה ולהתפתחות הילד הוא חלק מהמומחיות שלנו.
 
 <strong>🏢 איפה אנחנו נמצאים:</strong>
-• <strong>ביתר עילית</strong> - צוות מלמדים מקצועי
-• <strong>בית שמש</strong> - מפקחי קריאה ומורים מצויינים  
-• <strong>קרית ספר (מודיעין עילית)</strong> - רמה מקצועית גבוהה
+• <strong>ביתר עילית</strong> - המכון המרכזי
+• <strong>בית שמש</strong> - סניף מקצועי  
+• <strong>מודיעין עילית</strong> - לתושבי האזור
 • <strong>אונליין</strong> - מכל מקום בעולם!
 
 <strong>🔍 המבדק 360° שלנו בודק:</strong>
@@ -822,9 +879,7 @@
                 'שטף_קריאה': 'שטף קריאה',
                 'עיוורון_צבעים': 'עיוורון צבעים',
                 'נוזלים_באוזניים': 'נוזלים באוזניים',
-                'טווח_גילאים': 'טווח גילאים',
-                'הרצאות': 'הרצאות',
-                'לימודי_קריאה': 'לימודי קריאה'
+                'טווח_גילאים': 'טווח גילאים'
             };
             return titles[key] || 'הנושא שבחרתם';
         }
@@ -1285,100 +1340,6 @@
 
 זה בדיוק הייחוד שלנו - אנחנו פה בשביל כולם! 🌈`,
 
-            הרצאות: `🎤 <strong>הרצאות מקצועיות עם הרב אפרים שבדרון</strong>
-
-<strong>👨‍🏫 למי מיועדות ההרצאות?</strong>
-• <strong>מורים</strong> - להבנה מעמיקה של תלמידים מתקשים
-• <strong>הורים</strong> - כדי להבין טוב יותר את הילד שלהם
-• <strong>מטפלים</strong> - לשיפור הגישה הטיפולית
-
-<strong>🧠 מה מכסות ההרצאות?</strong>
-• <strong>הקושי של הילד המתקשה</strong> - מה באמת עובר לו בראש
-• <strong>סימפטומים</strong> - איך לזהות בעיות מוקדם
-• <strong>מה צריך לבדוק</strong> - הדרך הנכונה לאבחון
-• <strong>איך לטפל</strong> - גישות יעילות וכלים מעשיים
-
-<strong>⚡ פרק מיוחד - קושי בקשב וריכוז (ADD/ADHD):</strong>
-• <strong>הדמיות ייחודיות</strong> מטובי המומחים והרופאים בעולם
-• הסבר מעמיק על <strong>איך המוח עובד</strong>
-• הבנה של <strong>למה קורה קושי קשב וריכוז</strong>
-• כלים מעשיים להתמודדות
-
-<strong>🏥 שיתוף עם מערכת הבריאות:</strong>
-הרצאות נמסרות גם במסגרת <strong>קופת חולים לאומית</strong> - מה שמעיד על הרמה המקצועית והאמינות.
-
-<strong>💡 הנקודה החשובה - חשיבות המבדק:</strong>
-<strong>לא תמיד הקושי בקריאה ובלמידה זה בגלל חוסר יכולת לקרוא!</strong>
-
-לפעמים הסיבה האמיתית היא:
-• בעיות <strong>ראיה</strong> (קוצר, רוחק, מיקוד)
-• <strong>פזילה</strong> או עין עצלה
-• <strong>שמיעה לקויה</strong>
-• קושי ב<strong>שליפה</strong> וזכירה
-• בעיות <strong>קשב וריכוז</strong>
-
-<strong>🔍 המסר המרכזי:</strong>
-כדי להבין למה הילד מתקשה, צריך לבדוק את כל התחומים ולהבין מה שורש הקושי האמיתי - רק אז אפשר לתת טיפול יעיל!
-
-<strong>📞 להזמנת הרצאה או מבדק:</strong>
-🌐 <strong>www.mikraot.org</strong>
-
-<strong>🎯 למה השקעה בהרצאה שווה את זה?</strong>
-הבנה נכונה של הילד המתקשה יכולה לחסוך חודשים של תסכול ולפתח גישה טיפולית נכונה שתשנה את חייו!
-
-האם תרצו לשמוע עוד על נושאים ספציפיים מההרצאה? 🎪`,
-
-            לימודי_קריאה: `📚 <strong>לימודי קריאה במכון מקראות - שיטה ייחודית המשלבת מסורת וחדשנות</strong>
-
-<strong>🎯 השיטה הייחודית שלנו:</strong>
-<strong>שיטת השינון על פי המסורת</strong> - השיטה הוותיקה שעוברת מדור לדור, אך מותאמת כיום באופן אישי לכל ילד!
-
-<strong>🤖 החדשנות המהפכנית:</strong>
-• שילוב <strong>בינה מלאכותית מתקדמת</strong>
-• <strong>כלים חדשניים</strong> המותאמים לכל ילד
-• <strong>4 תוכנות ייעודיות</strong> ללמידה מותאמת אישית
-
-<strong>👶👦👧👨‍🦳 למי מתאים?</strong>
-• <strong>כל גיל</strong> - מ-5.5 ועד גילאים מבוגרים מאוד
-• <strong>כל רמת קושי</strong> - כולל קשיים חמורים
-• קשיים ב<strong>קריאה</strong>
-• קשיים ב<strong>הבנה</strong>
-• קשיים ב<strong>קשב וריכוז</strong>
-
-<strong>📅 איך הלימוד מתקיים?</strong>
-• <strong>יומיומי</strong> - חמישה ימים בשבוע
-• <strong>התקדמות מהירה ויציבה</strong>
-• מעקב שוטף של צוות המכון המקצועי
-
-<strong>🎯 התכנית האישית:</strong>
-כל תלמיד מקבל תכנית לימוד ייחודית שמזהה את <strong>מקור הקושי הספציפי שלו</strong> ומתאימה לו:
-• <strong>תרגולים מדויקים</strong>
-• <strong>קצב אישי</strong>
-• <strong>מעקב וזיהוי התקדמות</strong>
-
-<strong>📊 התוצאות המדהימות:</strong>
-<strong style="color: #8b2635;">מעל 95% הצלחה!</strong> השיטה נבדקה והוכיחה את עצמה לאורך השנים.
-
-<strong>🌟 המהפכה האמיתית:</strong>
-השילוב הייחודי בין:
-• <strong>מסורת עתיקה</strong> שעוברת מדור לדור
-• <strong>אמצעים מתקדמים</strong> של המאה ה-21
-• <strong>בינה מלאכותית</strong> המותאמת אישית
-
-<strong>💡 התוצאה:</strong>
-מהפכה אמיתית בתחום הוראת הקריאה שמאפשרת לכל ילד להצליח <strong>בקצב ובדרך שמתאימים רק לו!</strong>
-
-<strong>🎪 למה זה עובד כל כך טוב?</strong>
-• כל ילד הוא עולם ומלואו - ולכן מקבל טיפול אישי
-• השיטה מותאמת לסוג הקושי הספציפי
-• שילוב של ניסיון של דורות עם טכנולוגיה מתקדמת
-• מעקב צמוד ומתמיד
-
-<strong>📞 מוכנים להתחיל את המסע?</strong>
-<button onclick="openSchedulingBot()">📅 קביעת תור למבדק</button>
-
-זה לא רק לימודי קריאה - זה דרך חדשה לגלות את הפוטנציאל האמיתי של הילד! ✨`,
-
             טווח_גילאים: `👶👦👧👨‍🦳 <strong>טווח גילאים במכון מקראות - ללא הגבלת גיל!</strong>
 
 <strong>🎯 השאלה הנפוצה: "מאיזה גיל מקבלים?"</strong>
@@ -1637,9 +1598,9 @@
 
 <strong>🏢 איפה אנחנו נמצאים?</strong>
 יש לכם מספר אפשרויות נהדרות:
-• <strong>ביתר עילית</strong> - צוות מלמדים מקצועי
-• <strong>בית שמש</strong> - מפקחי קריאה ומורים מצויינים
-• <strong>קרית ספר (מודיעין עילית)</strong> - רמה מקצועית גבוהה  
+• <strong>ביתר עילית</strong> - המכון המרכזי שלנו
+• <strong>בית שמש</strong> - סניף מקצועי ונוח
+• <strong>מודיעין עילית</strong> - לתושבי האזור  
 • <strong>אונליין</strong> - מכל מקום בעולם!
 
 <strong>💡 מה אנחנו מציעים?</strong>
@@ -1704,12 +1665,6 @@
             }
             if (q.includes('גילאים') || q.includes('גיל') || q.includes('מקבלים') || q.includes('טווח')) {
                 return { text: responses.טווח_גילאים, showAI: true };
-            }
-            if (q.includes('הרצאות') || q.includes('הרצאה') || q.includes('אפרים שבדרון') || q.includes('מרצה')) {
-                return { text: responses.הרצאות, showAI: true };
-            }
-            if (q.includes('לימודי קריאה') || q.includes('לימודים') || q.includes('שיטת השינון') || q.includes('בינה מלאכותית') || q.includes('תוכנות')) {
-                return { text: responses.לימודי_קריאה, showAI: true };
             }
 
             // שאלות על חשיבות ו"למה"
@@ -2278,8 +2233,7 @@
 מצטערים, הייתה תקלה בשליחת הטופס לגוגל שיטס.
 
 <strong>📞 אנא פנו אלינו ישירות:</strong>
-• טלפון: 02-5370728
-• ווטסאפ: 054-5330850
+• טלפון: [02-5370728]
 
 נשמח לקבוע לכם תור טלפונית! 📱
 
@@ -2297,14 +2251,14 @@
 <strong>💬 אנחנו כאן בשבילכם!</strong>
 
 <strong>📞 דרכי יצירת קשר:</strong>
-• טלפון ישיר: 02-5370728
-• ווטסאפ: 054-5330850
-• אימייל: www.mikraot.org
-• כתובת: ביתר: רבי עקיבא21, בית שמש: הרצוג 33, קרית ספר: שערי תשובה 3
+• טלפון ישיר: [מספר טלפון]
+• ווטסאפ: [מספר ווטסאפ]
+• אימייל: [כתובת מייל]
+• כתובת: [כתובת המכון]
 
 <strong>⏰ זמני פעילות:</strong>
-• ימים א'-ה': 15:00-19:00
-• יום ו': סגור
+• ימים א'-ה': 8:00-18:00
+• יום ו': 8:00-13:00
 • מענה מיידי בווטסאפ ברוב השעות
 
 <strong>🎯 שירותי יעוץ חינמיים:</strong>
