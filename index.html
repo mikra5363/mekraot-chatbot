@@ -1847,7 +1847,7 @@
             }
         }
 
-        // פונקציה להוספת הודעה עם גלילה יציבה ומחוזקת
+        // פונקציה להוספת הודעה עם גלילה יציבה ומחוזקת + תמיכה ב"קרא עוד" בטלפונים
         function addMessage(text, isUser, showAI = false) {
             const container = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
@@ -1864,9 +1864,15 @@
             }
             
             const content = document.createElement('div');
-            content.innerHTML = text.replace(/\n/g, '<br>');
-            bubble.appendChild(content);
             
+            // בדיקה אם זה טלפון והתשובה ארוכה (עבור תשובות בוט בלבד)
+            if (!isUser && isMobileDevice && shouldUseTruncation(text)) {
+                setupTruncatedContent(content, text, bubble);
+            } else {
+                content.innerHTML = text.replace(/\n/g, '<br>');
+            }
+            
+            bubble.appendChild(content);
             messageDiv.appendChild(bubble);
             container.appendChild(messageDiv);
             
@@ -1922,6 +1928,246 @@
                     }
                 }, 1000);
             }
+        }
+
+        // פונקציה לבדיקה אם צריך להשתמש בחיתוך טקסט
+        function shouldUseTruncation(text) {
+            // ספירת מילים כללית - אם יש יותר מ-70 מילים
+            const cleanText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            const wordCount = cleanText.split(' ').length;
+            return wordCount > 70;
+        }
+
+        // פונקציה לחיתוך טקסט עם כפתור "קרא עוד" - שילוב מילים + פסקאות
+        function setupTruncatedContent(contentDiv, fullText, bubbleDiv) {
+            // חלוקה לפסקאות
+            const paragraphs = splitTextByParagraphs(fullText);
+            
+            // אם יש מעט מילים, הצג הכול
+            const totalWords = countWordsInText(fullText);
+            if (totalWords <= 70) {
+                contentDiv.innerHTML = fullText.replace(/\n/g, '<br>');
+                return;
+            }
+
+            // יצירת חלקים לפי מילים + פסקאות
+            const chunks = createSmartChunks(paragraphs, 70);
+            let currentChunkIndex = 0;
+
+            // הצגת החלק הראשון
+            displayChunk();
+
+            function displayChunk() {
+                // הצגת כל החלקים עד לחלק הנוכחי
+                let displayText = '';
+                for (let i = 0; i <= currentChunkIndex; i++) {
+                    if (chunks[i]) {
+                        displayText += chunks[i];
+                        // הוסף ריווח בין חלקים אם צריך
+                        if (i < currentChunkIndex && chunks[i + 1]) {
+                            displayText += '<br><br>';
+                        }
+                    }
+                }
+
+                contentDiv.innerHTML = displayText.replace(/\n/g, '<br>');
+
+                // אם יש עוד חלקים, הוסף כפתור "קרא עוד"
+                if (currentChunkIndex < chunks.length - 1) {
+                    const readMoreBtn = document.createElement('button');
+                    readMoreBtn.innerHTML = '📖 קרא עוד...';
+                    readMoreBtn.style.cssText = `
+                        background: linear-gradient(135deg, #8b2635, #a12e42);
+                        color: white;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 15px;
+                        cursor: pointer;
+                        font-size: 12px;
+                        margin: 12px 0 0 0;
+                        box-shadow: 0 2px 8px rgba(139, 38, 53, 0.3);
+                        transition: all 0.3s ease;
+                        display: block;
+                        width: auto;
+                        min-width: 100px;
+                    `;
+                    
+                    readMoreBtn.onmouseover = function() {
+                        this.style.transform = 'translateY(-2px)';
+                        this.style.boxShadow = '0 4px 12px rgba(139, 38, 53, 0.4)';
+                    };
+                    
+                    readMoreBtn.onmouseout = function() {
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = '0 2px 8px rgba(139, 38, 53, 0.3)';
+                    };
+
+                    readMoreBtn.onclick = function() {
+                        // אפקט לחיצה
+                        this.style.transform = 'scale(0.95)';
+                        this.innerHTML = '⏳ טוען...';
+                        
+                        setTimeout(() => {
+                            currentChunkIndex++;
+                            displayChunk();
+                        }, 300);
+                    };
+
+                    contentDiv.appendChild(readMoreBtn);
+                }
+            }
+        }
+
+        // פונקציה לספירת מילים בטקסט (ללא תגי HTML)
+        function countWordsInText(htmlText) {
+            const cleanText = htmlText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            return cleanText.split(' ').filter(word => word.length > 0).length;
+        }
+
+        // פונקציה ליצירת חלקים חכמים - שילוב מילים + פסקאות
+        function createSmartChunks(paragraphs, targetWordCount) {
+            const chunks = [];
+            let currentChunk = '';
+            let currentWordCount = 0;
+
+            for (let i = 0; i < paragraphs.length; i++) {
+                const paragraph = paragraphs[i];
+                const paragraphWordCount = countWordsInText(paragraph);
+
+                // אם הפסקה הנוכחית לבדה גדולה מהמטרה
+                if (paragraphWordCount > targetWordCount && currentChunk === '') {
+                    // הוסף אותה כחלק נפרד
+                    chunks.push(paragraph);
+                    continue;
+                }
+
+                // אם הוספת הפסקה הזאת תעבור את המטרה
+                if (currentWordCount + paragraphWordCount > targetWordCount && currentChunk !== '') {
+                    // סיים את החלק הנוכחי
+                    chunks.push(currentChunk.trim());
+                    
+                    // התחל חלק חדש עם הפסקה הנוכחית
+                    currentChunk = paragraph;
+                    currentWordCount = paragraphWordCount;
+                } else {
+                    // הוסף את הפסקה לחלק הנוכחי
+                    if (currentChunk !== '') {
+                        currentChunk += '<br><br>' + paragraph;
+                    } else {
+                        currentChunk = paragraph;
+                    }
+                    currentWordCount += paragraphWordCount;
+                }
+            }
+
+            // הוסף את החלק האחרון
+            if (currentChunk.trim()) {
+                chunks.push(currentChunk.trim());
+            }
+
+            return chunks;
+        }
+
+        // פונקציה לחלוקת טקסט לפסקאות תוך שמירה על מבנה HTML
+        function splitTextByParagraphs(htmlText) {
+            // החלפת \n ב-<br> אם צריך
+            let processedText = htmlText.replace(/\n/g, '<br>');
+            
+            // זיהוי נקודות פיצול לוגיות לפסקאות:
+            // 1. כותרות עם <strong> בתחילת שורה
+            // 2. כפל <br> (מעבר שורה כפול)
+            // 3. סוף </strong> ולאחריו <br>
+            
+            const paragraphs = [];
+            let currentParagraph = '';
+            let insideStrong = false;
+            
+            // פיצול ראשוני לפי דפוסים חזקים
+            const parts = processedText.split(/(<strong>.*?<\/strong>)/gi);
+            
+            for (let i = 0; i < parts.length; i++) {
+                const part = parts[i];
+                
+                if (!part.trim()) continue;
+                
+                // אם זו כותרת (מתחילה ב-<strong>)
+                if (part.match(/^<strong>/i)) {
+                    // אם יש תוכן קודם, סיים את הפסקה הנוכחית
+                    if (currentParagraph.trim()) {
+                        paragraphs.push(currentParagraph.trim());
+                        currentParagraph = '';
+                    }
+                    
+                    // התחל פסקה חדשה עם הכותרת
+                    currentParagraph = part;
+                    
+                    // בדוק אם יש תוכן נוסף אחרי הכותרת באותו חלק
+                    if (i + 1 < parts.length && parts[i + 1] && parts[i + 1].trim()) {
+                        // הוסף את התוכן שאחרי הכותרת לאותה פסקה
+                        let nextPart = parts[i + 1];
+                        
+                        // אם החלק הבא מכיל <br><br> - פצל אותו
+                        if (nextPart.includes('<br><br>')) {
+                            const subParts = nextPart.split('<br><br>');
+                            currentParagraph += subParts[0];
+                            
+                            // סיים את הפסקה הנוכחית
+                            paragraphs.push(currentParagraph.trim());
+                            currentParagraph = '';
+                            
+                            // התחל פסקאות חדשות מהחלקים הנותרים
+                            for (let j = 1; j < subParts.length; j++) {
+                                if (subParts[j].trim()) {
+                                    if (currentParagraph.trim()) {
+                                        paragraphs.push(currentParagraph.trim());
+                                    }
+                                    currentParagraph = subParts[j];
+                                }
+                            }
+                        } else {
+                            currentParagraph += nextPart;
+                        }
+                        
+                        i++; // דלג על החלק הבא כי כבר עיבדנו אותו
+                    }
+                    
+                } else {
+                    // זה לא כותרת - בדוק אם יש פיצולים פנימיים
+                    if (part.includes('<br><br>')) {
+                        const subParts = part.split('<br><br>');
+                        
+                        // הוסף את החלק הראשון לפסקה הנוכחית
+                        currentParagraph += subParts[0];
+                        
+                        // סיים את הפסקה הנוכחית אם יש בה תוכן
+                        if (currentParagraph.trim()) {
+                            paragraphs.push(currentParagraph.trim());
+                            currentParagraph = '';
+                        }
+                        
+                        // צור פסקאות חדשות מהחלקים הנותרים
+                        for (let j = 1; j < subParts.length; j++) {
+                            if (subParts[j].trim()) {
+                                if (currentParagraph.trim()) {
+                                    paragraphs.push(currentParagraph.trim());
+                                }
+                                currentParagraph = subParts[j];
+                            }
+                        }
+                    } else {
+                        // הוסף לפסקה הנוכחית
+                        currentParagraph += part;
+                    }
+                }
+            }
+            
+            // הוסף את הפסקה האחרונה אם יש תוכן
+            if (currentParagraph.trim()) {
+                paragraphs.push(currentParagraph.trim());
+            }
+            
+            // ניקוי וסינון פסקאות ריקות
+            return paragraphs.filter(p => p.trim().length > 0);
         }
 
         // פונקציה לפתיחת טופס קביעת תור
