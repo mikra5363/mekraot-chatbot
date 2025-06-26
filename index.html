@@ -2182,6 +2182,7 @@
             }
         }
         
+        // פונקציה להוספת הודעה עם גלילה יציבה ומחוזקת + תמיכה ב"קרא עוד" בטלפונים
         function addMessage(text, isUser, showAI = false) {
             const container = document.getElementById('chatMessages');
             const messageDiv = document.createElement('div');
@@ -2266,9 +2267,9 @@
 
         // פונקציה לבדיקה אם צריך להשתמש בחיתוך טקסט
         function shouldUseTruncation(text) {
-            // חלוקה לפסקאות ובדיקה אם יש יותר מ-2 פסקאות
+            // חלוקה לפסקאות ובדיקה אם יש יותר מ-4 פסקאות
             const paragraphs = splitTextByParagraphs(text);
-            return paragraphs.length > 2; // אם יש יותר מ-2 פסקאות
+            return paragraphs.length > 4; // אם יש יותר מ-4 פסקאות
         }
 
         // פונקציה לחיתוך טקסט עם כפתור "קרא עוד" - לפי פסקאות
@@ -2276,13 +2277,13 @@
             // חלוקה לפסקאות
             const paragraphs = splitTextByParagraphs(fullText);
             
-            // אם יש 2 פסקאות או פחות, הצג הכול
-            if (paragraphs.length <= 2) {
+            // אם יש 4 פסקאות או פחות, הצג הכול
+            if (paragraphs.length <= 4) {
                 contentDiv.innerHTML = fullText.replace(/\n/g, '<br>');
                 return;
             }
 
-            let currentParagraphIndex = 1; // מתחילים מפסקה 0 ו-1 (2 פסקאות ראשונות)
+            let currentParagraphIndex = 3; // מתחילים מפסקה 0,1,2,3 (4 פסקאות ראשונות)
 
             // הצגת החלק הראשון
             displayParagraphs();
@@ -2338,8 +2339,8 @@
                         this.innerHTML = '⏳ טוען...';
                         
                         setTimeout(() => {
-                            // הוסף עוד 2 פסקאות או כמה שנשארו
-                            currentParagraphIndex = Math.min(currentParagraphIndex + 2, paragraphs.length - 1);
+                            // הוסף עוד 3 פסקאות או כמה שנשארו
+                            currentParagraphIndex = Math.min(currentParagraphIndex + 3, paragraphs.length - 1);
                             displayParagraphs();
                         }, 300);
                     };
