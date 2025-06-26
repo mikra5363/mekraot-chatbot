@@ -2181,6 +2181,211 @@
                 }
             }
         }
+        // פונקציה להוספת הודעה עם גלילה יציבה ומחוזקת + תמיכה ב"קרא עוד" בטלפונים
+        function addMessage(text, isUser, showAI = false) {
+            const container = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message-bubble';
+            
+            if (showAI && !isUser) {
+                const aiDiv = document.createElement('div');
+                aiDiv.className = 'ai-indicator';
+                aiDiv.innerHTML = '🧠 תשובה חכמה מותאמת אישית';
+                bubble.appendChild(aiDiv);
+            }
+            
+            const content = document.createElement('div');
+            
+            // בדיקה אם זה טלפון והתשובה ארוכה (עבור תשובות בוט בלבד)
+            if (!isUser && isMobileDevice && shouldUseTruncation(text)) {
+                setupTruncatedContent(content, text, bubble);
+            } else {
+                content.innerHTML = text.replace(/\n/g, '<br>');
+            }
+            
+            bubble.appendChild(content);
+            messageDiv.appendChild(bubble);
+            container.appendChild(messageDiv);
+            
+            // הגדרה יציבה מחוזקת לגלילה - השורה הראשונה תמיד תישאר במסך
+            setTimeout(() => {
+                if (isUser) {
+                    // משתמש - גלילה רגילה למטה
+                    container.scrollTop = container.scrollHeight;
+                } else {
+                    // בוט - גלילה מחוזקת שתבטיח שהשורה הראשונה תמיד נראית
+                    const containerHeight = container.clientHeight;
+                    const messageTop = messageDiv.offsetTop;
+                    
+                    // הגדרה קבועה - השורה הראשונה תמיד תהיה 15px מהחלק העליון
+                    const targetPosition = messageTop - 15;
+                    
+                    container.scrollTo({
+                        top: Math.max(0, targetPosition),
+                        behavior: 'smooth'
+                    });
+                }
+            }, 50);
+            
+            // מנגנון גיבוי מחוזק - וודא שהשורה הראשונה תמיד נראית
+            if (!isUser) {
+                setTimeout(() => {
+                    const containerHeight = container.clientHeight;
+                    const containerScrollTop = container.scrollTop;
+                    const messageTop = messageDiv.offsetTop;
+                    
+                    // בדיקה אם השורה הראשונה מוסתרת
+                    const isFirstLineHidden = messageTop < containerScrollTop || messageTop > (containerScrollTop + containerHeight - 50);
+                    
+                    if (isFirstLineHidden) {
+                        // תיקון מיידי - העבר את השורה הראשונה למיקום נראה
+                        container.scrollTo({
+                            top: Math.max(0, messageTop - 15),
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 200);
+                
+                // בדיקה נוספת לאחר שניה
+                setTimeout(() => {
+                    const containerScrollTop = container.scrollTop;
+                    const messageTop = messageDiv.offsetTop;
+                    
+                    if (messageTop < containerScrollTop) {
+                        container.scrollTo({
+                            top: Math.max(0, messageTop - 15),
+                            behavior: 'smooth'
+                        });
+                    }
+                }, 1000);
+            }
+        }
+
+        // פונקציה לבדיקה אם צריך להשתמש בחיתוך טקסט
+        function shouldUseTruncation(text) {
+            // הסרת תגי HTML לספירת מילים אמיתית
+            const cleanText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            const wordCount = cleanText.split(' ').length;
+            return wordCount > 50; // אם יש יותר מ-50 מילים
+        }
+
+        // פונקציה לחיתוך טקסט עם כפתור "קרא עוד"
+        function setupTruncatedContent(contentDiv, fullText, bubbleDiv) {
+            // הסרת תגי HTML זמנית לספירה
+            const cleanText = fullText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            const words = cleanText.split(' ');
+            
+            // אם יש פחות מ-50 מילים, הצג הכול
+            if (words.length <= 50) {
+                contentDiv.innerHTML = fullText.replace(/\n/g, '<br>');
+                return;
+            }
+
+            // חיתוך החלקים המקוריים לחלקים של 50 מילים
+            const textParts = splitTextByWords(fullText, 50);
+            let currentPartIndex = 0;
+
+            // הצגת החלק הראשון
+            displayTextPart();
+
+            function displayTextPart() {
+                // הצגת כל החלקים עד לחלק הנוכחי
+                let displayText = '';
+                for (let i = 0; i <= currentPartIndex; i++) {
+                    displayText += textParts[i];
+                    if (i < currentPartIndex) displayText += ' ';
+                }
+
+                contentDiv.innerHTML = displayText.replace(/\n/g, '<br>');
+
+                // אם יש עוד חלקים, הוסף כפתור "קרא עוד"
+                if (currentPartIndex < textParts.length - 1) {
+                    const readMoreBtn = document.createElement('button');
+                    readMoreBtn.innerHTML = '📖 קרא עוד...';
+                    readMoreBtn.style.cssText = `
+                        background: linear-gradient(135deg, #8b2635, #a12e42);
+                        color: white;
+                        border: none;
+                        padding: 8px 16px;
+                        border-radius: 15px;
+                        cursor: pointer;
+                        font-size: 12px;
+                        margin: 8px 0 0 0;
+                        box-shadow: 0 2px 8px rgba(139, 38, 53, 0.3);
+                        transition: all 0.3s ease;
+                        display: block;
+                    `;
+                    
+                    readMoreBtn.onmouseover = function() {
+                        this.style.transform = 'translateY(-2px)';
+                        this.style.boxShadow = '0 4px 12px rgba(139, 38, 53, 0.4)';
+                    };
+                    
+                    readMoreBtn.onmouseout = function() {
+                        this.style.transform = 'translateY(0)';
+                        this.style.boxShadow = '0 2px 8px rgba(139, 38, 53, 0.3)';
+                    };
+
+                    readMoreBtn.onclick = function() {
+                        // אפקט לחיצה
+                        this.style.transform = 'scale(0.95)';
+                        this.innerHTML = '⏳ טוען...';
+                        
+                        setTimeout(() => {
+                            currentPartIndex++;
+                            displayTextPart();
+                        }, 300);
+                    };
+
+                    contentDiv.appendChild(readMoreBtn);
+                }
+            }
+        }
+
+        // פונקציה לחלוקת טקסט למילים תוך שמירה על תגי HTML
+        function splitTextByWords(htmlText, wordsPerPart) {
+            // פיצול הטקסט לאלמנטים (טקסט ותגי HTML)
+            const elements = htmlText.match(/(<[^>]*>|[^<]+)/g) || [];
+            const parts = [];
+            let currentPart = '';
+            let currentWordCount = 0;
+
+            elements.forEach(element => {
+                if (element.startsWith('<')) {
+                    // זה תג HTML - הוסף אותו כמו שהוא
+                    currentPart += element;
+                } else {
+                    // זה טקסט - פצל למילים
+                    const words = element.trim().split(/\s+/).filter(word => word.length > 0);
+                    
+                    words.forEach(word => {
+                        if (currentWordCount >= wordsPerPart) {
+                            // התחל חלק חדש
+                            parts.push(currentPart.trim());
+                            currentPart = word;
+                            currentWordCount = 1;
+                        } else {
+                            // הוסף לחלק הנוכחי
+                            if (currentPart && !currentPart.endsWith(' ')) {
+                                currentPart += ' ';
+                            }
+                            currentPart += word;
+                            currentWordCount++;
+                        }
+                    });
+                }
+            });
+
+            // הוסף את החלק האחרון
+            if (currentPart.trim()) {
+                parts.push(currentPart.trim());
+            }
+
+            return parts;
+        }
 
         function sendFormToOwner(formData) {
             // הודעה שמעדכנת שהטופס נשלח
@@ -2306,7 +2511,7 @@
         // החלפת בועות אוטומטית כל 25 שניות
         setInterval(() => {
             generateRandomBubbles();
-        }, 25000); // 25 שניות = 25,000 מילישניות
+        }, 16000); // 25 שניות = 16,000 מילישניות
     </script>
 </body>
 </html>
